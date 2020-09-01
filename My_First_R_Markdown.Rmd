@@ -81,10 +81,8 @@ help(package = "ggplot2")
 ```
  
  If you still have questions about what functions within a package are right for you or how to use them, many packages include “vignettes.” These are extended help files, that include an overview of the package and its functions, but often they go the extra mile and include detailed examples of how to use the functions in plain words that you can follow along with to see how to use the package. To see the vignettes included in a package, you can use the *browseVignettes()* function.  
- 
-```{r}
-browseVignettes("ggplot2")
-```
+ Eg: *browseVignettes("ggplot2")*
+
 
  You should see that there are two included vignettes: “Extending ggplot2” and “Aesthetic specifications.” Exploring the Aesthetic specifications vignette is a great example of how vignettes can be helpful, clear instructions on how to use the included functions.
 
@@ -286,15 +284,15 @@ y
 ## Objects and Attributes  
 
 R has 5 basic or "atomic"classes of objects  
- - character (text)
- - numeric (real numbers, ie decimal numbers) 
- - integer 
- - complex 
+ - character (text)  
+ - numeric (real numbers, ie decimal numbers)  
+ - integer  
+ - complex  
  - logical (true/false)  
  
 The most basic object is a vector.  
- - Vectors can contain only objects of the same class
- - except *lists* 
+ - Vectors can contain only objects of the same class  
+ - except *lists*  
  
 Empty vectors can be created with the vector() function. It has 2 arguments: the class of the object and the length of the vector.
 
@@ -306,10 +304,10 @@ Typically treated as numeric objects (Even if "1" is entered, it is understood a
 
 ### Attributes  
 Objects can have attributes such as:  
- - names, dimnames 
- - dimensions (eg matrices and arrays) 
- - class 
- - length (the length of a vector is the number of elements in the vector) 
+ - names, dimnames  
+ - dimensions (eg matrices and arrays)  
+ - class  
+ - length (the length of a vector is the number of elements in the vector)  
  - other, user-defined attributes  
  
  Attributes can be accessed using the *attributes()* function.  
@@ -383,7 +381,8 @@ Matrices can be made from normal vectors
 ```{r}
 m <- 1:10
 m
-dim(m) <- c(2,5)  ## adds the dimension attribute to it, while assigning a value to the dim attribute of m: the number of rows and columns.
+dim(m) <- c(2,5)  ## adds the dimension attribute to it, while assigning a value to 
+ ## the dim attribute of m: the number of rows and columns.
 m
 ```
 
@@ -402,7 +401,6 @@ They are treated specially by modeling functions like *lm()* and *glm()*. They a
 x <- factor(c("yes", "yes", "no", "yes", "no"))
 x
 table(x)  ## counts how many of each level
-x
 unclass(x)  ## removes the class of the vector, shows integer values
 
 ```  
@@ -430,12 +428,12 @@ is.nan(x)
 
 ## Data Frames  
 Used to store tabular data.
- - represented as a special type of list, but each element of the list has to have the same length. 
- - each element of the list is a column, and the length of each element is the number of rows. 
- - they can store different classes of objects in each column, which makes them different from matrices. 
- - special attribute called *row.names* 
- - usually created with *read.table()* or *read.csv()* or *data.frame()* 
- - can be converted into matrices with *data.matrix()*  (will coerce objects into being the same class)
+ - represented as a special type of list, but each element of the list has to have the same length.  
+ - each element of the list is a column, and the length of each element is the number of rows.  
+ - they can store different classes of objects in each column, which makes them different from matrices.  
+ - special attribute called *row.names*  
+ - usually created with *read.table()* or *read.csv()* or *data.frame()*  
+ - can be converted into matrices with *data.matrix()*  (will coerce objects into being the same class)  
 
 ```{r}
 x <- data.frame(foo = 1:4, bar = c(T, T, F, F))
@@ -465,11 +463,70 @@ m
 ```  
 
 
+# Reading Tabular Data  
+Principal functions  
+ - *read.table()*, *read.csv()* read text files in rows and columns and return a data frame in R  
+ - *readLines()* reads lines of a text file, gives a character vector  
+ - *source()* read R code files  
+ - *dget()* read R files: objects that are "deparsed"  
+ - *load()* reading binary objects into R  
+ - *unserialize()* also for binary objects  
+ 
+Analogous functions for writing data, in order:  
+ - *write.table()*  
+ - *writeLines()*  
+ - *dump()*  
+ - *dput()*  
+ - *save()*  
+ - *serialize()*  
+ 
+### Reading files with read.table()  
+Common arguments:  
+ - *file()* name of file / path to file  
+ - *header()* indicates if the first line is a header or not  
+ - *sep()* indicates how columns are separated  
+ - *colClasses()* character vector of the same length as number of columns. Indicates class of each column (can be different for each column).  
+ - *nrows()* number of rows (not required)  
+ - *comment.char()* indicates what character indicates comments  
+ - *skip()* skips a number of lines  
+ - *stringsAsFactors()* default=true, are character variables encoded as factors?  
 
+for moderately sized datasets, you can call read.table without any arguments other than *file()*. R will automatically:  
+ - skip lines that begin with #  
+ - find number of rows  
+ - classify variables  
+ 
+ However, giving R these arguments will make it runs more smoothly and predictably. *read.csv()* is an identical command except that the default separator is a comma instead of a space. CSV files are common outputs from excel files and many other programs.  
 
+## Reading Larger Datasets with read.table  
+Things to do to facilitate reading.  
+ - Read the Help page carefully for read.table
+ - Make a rough calculation of the memory required to store your dataset. Is it larger than the RAM on your computer? If so don't proceed.  
+ - Set *comment.char = " "* if there are no commented lines in your file.  
+ - use the colClasses argument. Specifying this option instead of using the default. R won't need to try to figure it out. If all classes are the same class you can set them all with *colClasses = "numeric"* for example. Alternatively, use the first 100 rows and let read.table find the classes, then apply them to reading the whole text:  
+```{r}
+initial <- read.table("datatable.txt", nrows = 100)
+classes <- sapply(initial, class)  ## S apply calls the class of each column
+tabAll <- read.table("datatable.txt", colClasses = classes)
+```  
+ - set *nrows* to help reduce memory usage. a mild overestimate is okay.  
+ 
+It's useful to know a few things:  
+ - How much memry is available?  
+ - what other applications are in use?  
+ - are other users using resources of the computer?  
+ - what operating system are you using?  is it 32 or 64 bit?  
 
+### Calculating Memory Requirements  
+Consider a data frame with 1,500,00 rows and 120 columns, all of which are numeric data. How much memory is required?  
 
+each numeric object required 8 bytes, stored in 64 bits of data.  
 
+1,500,00 x 120 x 8 bytes/numeric = 1,440,000,000 bytes  
+ 1,440,000,000 / (2^20 bytes / MB) = 1,373.29 MB  
+ = 1.34 GB  
+ 
+ This is the RAW data. A bit more is required to read the data: rule of thumb is you require double the memory as the raw data.  
 
 
 
