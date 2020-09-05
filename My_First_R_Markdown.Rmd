@@ -528,11 +528,305 @@ each numeric object required 8 bytes, stored in 64 bits of data.
  
  This is the RAW data. A bit more is required to read the data: rule of thumb is you require double the memory as the raw data.  
 
+## Other Text Formats  
+Not in form of tables. Used to store more metadata, for example class of the data in each column. Work better in version control, as text files are more easily read by git. It can be easier to fix corruption in the file.  
+Downside: less space-efficient.  
+*dump()* and *dput()* to write, *source()* and *dget()* to read.  
+
+```{r}
+y <- data.frame(a = 1, b = "a")
+dput(y)
+
+dput(y, file = "y.R")
+new.y <- dget("y.R")
+new.y
+```  
+
+*dput* can only be used on one R object, but *dump* can be used in multiple.  
+```{r}
+x <- "foo"
+y <- data.frame(a = 1, b = "a")
+dump(c("x", "y"), file = "data.R")
+rm(x, y)   ## removes the objects x and y
+source("data.R")   ## reconstructs the objects from the file
+y
+x
+```  
+
+## Interfaces with other things  
+Establish connections with files, compressed files or other more exotic things.  
+ - *file()*  
+ - *gzfile()* file compressed with gzip  
+ - *bzfile()* file compressed with bzip2  
+ - *url()* opens a connection to a webpage  
+
+*file()* function has the arguments:  
+ - *description* name of the file  
+ - *open* has a flag to describe:  
+  - "r" read only.  
+  - "w" writing (and initializing a new file)  
+  - "a" appending  
+  - "rb", "wb", "ab", as above but in binary mode (windows)  
 
 
+Connections let you navigate files, too. Often connections happen behind the scenes.  
+```{r}
+con <- file("datatable.txt", "r")
+data <- read.csv(con)
+close(con)
+
+ ## these three lines are equivalent to simply using:
+
+data <- read.csv("datatable.txt")
+```  
+
+But it can be useful to do so explicitly, such as when reading lines of a text file:  
+```{r}
+con <- file("datatable.txt")
+x <- readLines(con, 10)
+x
+close(con)
+```  
+*writeLines()* take a character vector and writes each element one line at a time to a text file.  
+*readLines()* can also be used to read from a website, after establishing a connection to a non-file object.
+```{r}
+con <- url("http://www.jhsph.edu", "r")
+x <- readLines(con)
+head(x)
+close(con)
+```   
+This is another way to read data other than *read.Table* and *read.csv*.  
 
 
+## Subsetting
+extracting subsets of R objects  
+ - [ always returns an object of the same class as the original. e.g. subsetting a vector makes a vector. Can be used to select more than one element.  
+ - [[ used to extract elements of a list or dataframa. Can only extract a single element. Returned object won't necessarily be of the same class.  
+ - S is used to extract elements of a list or dataframe by name. Similar to using [[  
+```{r}
+x <- c("a", "b", "c", "c", "d", "a")
+x[1]
+x[2]
+x[1:4]  ## subsetting using a numerical index
+x[x > "a"]  ## subsetting using a logical index
 
+u <- x > "a"  ## created logical vector u
+u
+x[u]  ## subsetting using a logical vector as an index
+```  
+ 
+### Subsetting Lists  
+```{r}
+x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+x[1]  ## extract 1st element, same class as original (a list)
+x[[1]] ## extract 1st element as just a sequence
+x$bar ## gives element associated with name "bar"
+x[["bar"]] ## same as above
+x["bar"] ## same as x[1], returns it as a list
+
+x[c(1,3)]  ## extract multiple elements, returns as same class (list)
+
+name <- "foo" ## the name of an element can be saved as an object, too
+x[[name]]  ## useful to look up a name that is automatically computated
+x$name  ## doesn't work as [[ ]]. Only looks for the literal name
+x$foo  ## works because "foo" is a valid name
+```
+
+The [[ can take an integer sequence:  
+```{r}
+x <- list(a = list(10, 12, 14), b = c(3.14, 2.81))
+x[[c(1,3)]]  ## extracts the 3rd element of the 1st list
+             ## inception!
+x[[1]][[3]]  ## double subsetting, same result as above
+x[[c(2,1)]]  ## one more example
+```  
+
+### Subsetting Matrices  
+Can be subset with a row index and a column index.  
+```{r}
+x <- matrix(1:6, 2, 3)
+x
+x[1, 2]
+x[2, 1]
+```  
+Indices can also be missing, which will return a full row or column.  
+```{r}
+x[1, ]
+x[, 2]
+```  
+
+By default, when a single element of a matrix is retrieved, it's returned as a vector of length 1, rather than a 1 x 1 matrix. this can be turned off by setting *drop = FALSE*.  
+```{r}
+x <- matrix(1:6, 2, 3)
+x
+x[1, 2]
+x[1, 2, drop = FALSE]
+
+## A similar behaviour occurs when subsetting a single column 
+## or row.
+
+x[1, ]  ## returns a vector
+x[1, , drop = FALSE]  ## returns a matrix
+```  
+
+### Partial Matching
+Partial matching names is allowed with [[ and $  
+```{r}
+x <- list(aardvark = 1:5, peter = 0.6, paul = 3.14)
+x$a  ## by default looks for a name that matches "a". 
+x$p  ## fails when there are multiple matches
+x[["a"]]  ## looks for an exact match, fails
+x[["a", exact = FALSE]]  ## default behaviour can be turned off
+```  
+
+### Removing NA values
+A common task  
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)  ## an object that requires cleaning
+bad <- is.na(x)  ## logical vector testing for NA
+bad
+x[!bad]  ## "!" used to invert the logical vector. 
+         ## The logical vector determines which elements to return.
+```  
+
+You can take the subset of different object that have no missing values:  
+```{r}
+x <- c(1, 2, NA, 4, NA, 6, 7, 8, NA, 10, 11)
+y <- c("a", "b", NA, "d", NA, "f", "g", "h", "i", NA, "k")
+good <- complete.cases(x, y)
+good
+x[good]  ## note some data is lost because of missing values in y
+y[good]  ## note some data is lost because of missing values in x
+```  
+
+Removing NA values from dataframes. Also removes whole rows or columns where NAs are present.  
+```{r}
+airquality[1:6, ]  ## example data frame
+
+good <- complete.cases(airquality)  
+               ## logical vector tells me which rows are complete.
+airquality[good, ][1:6, ]  
+        ## subset the airquality matrix using the logical vector
+```  
+
+## Vectorised Operations  
+Many operations in % are *vectorised*, making code more efficient, concise and easier to read.  
+```{r}
+x <- 1:4; y <- 6:9
+x + y  ## ass 1st element of x to 1st element of y, 2nd to 2nd, etc.
+x > 2  ## compares all numbers to 2
+x >= 2
+y == 8  ## == tests for equality
+x * y  ## also works with other operations
+x / y
+```  
+
+Similarly with matrices:  
+```{r}
+x <- matrix(1:4, 2, 2); y <- matrix(rep(10, 4), 2, 2)
+x
+y
+x * y  ## element-wise multiplication
+x / y
+
+x %*% y  ## true matrix multiplication
+```
+
+## Quiz Questions
+```{r}
+## Extract the subset of rows of the data frame where Ozone values are above 31 and Temp values are above 90. What is the mean of Solar.R in this subset?
+
+quiz <- read.csv(file = "hw1_data.csv")
+Ozone <- quiz[ , 1]  ## creating a list of column 1, Ozone
+Temp <- quiz[ , 4]  ## creating a list of column 4, Temp
+Solar.R <- quiz[ , 2]  ## creating a list of column 2, Solar.R
+
+Truncated <- cbind(Ozone, Temp, Solar.R)  ## merge into new matrix
+
+Cleanrows <- complete.cases(Truncated)
+                 ## logical vector for complete rows
+
+ValidRows124 <- Truncated[Cleanrows, ]  ## extract complete rows
+
+CleanOzone <- ValidRows124[ , 1]  ## List of column 1 of the new matrix
+OzoneTest <- CleanOzone > 31  ## logical vector for Ozone column > 31
+
+BigOzone <- ValidRows124[OzoneTest, ]
+           ## matrix with rows where ozone is bigger than 31 extracted
+
+CleanTemp <- BigOzone[ , 2]
+           ## List of column 2 of the BigOzone matrix
+TempTest <- CleanTemp > 90  ## logical vector for Temp column > 90
+BigTemp <- BigOzone[TempTest, ] 
+        ## matrix with rows where Ozone is bigger than 31 
+        ## and Temp is bigger than 90
+BigTemp
+
+mean(BigTemp[ , 3])
+
+```  
+
+**A more elegant solution:**
+```{r}
+## Extract the subset of rows of the data frame where Ozone values are above 31 and Temp values are above 90. What is the mean of Solar.R in this subset?
+
+quiz <- read.csv(file = "hw1_data.csv")  ##reading file
+Ozone <- quiz[ , 1]  ## list of column 1, Ozone
+Temp <- quiz[ , 4]  ## list of column 4, Temp
+Solar.R <- quiz[ , 2]  ## list of column 2, Solar.R
+
+Truncated <- cbind(Ozone, Temp, Solar.R)  ## merge into new matrix
+
+Cleanrows <- complete.cases(Truncated)
+                 ## logical vector for complete rows
+
+ValidRows124 <- Truncated[Cleanrows, ]  ## extract complete rows
+
+OandTTest <- ValidRows124[ , 1] > 31 & ValidRows124[ , 2] > 90
+        ## execute both tests and save as a logical vector
+
+ValidRows124[OandTTest, ]  ## This is the resulting matrix
+
+mean(ValidRows124[OandTTest, ][ , 3])
+      ## taking the mean of the third column of the resulting matrix
+```  
+
+```{r}
+ ## What is the mean of "Temp" when "Month" is equal to 6? 
+quiz <- read.csv(file = "hw1_data.csv")  ##reading file
+Temp <- quiz[ , 4]  ## list of column 4, Temp
+Month <- quiz[ , 5]  ## list of column 5, Month
+
+Truncated <- cbind(Temp, Month)  ## merge into new matrix
+Cleanrows <- complete.cases(Truncated)
+                 ## logical vector for complete rows
+ValidRows124 <- Truncated[Cleanrows, ]  ## extract complete rows
+
+June <- ValidRows124[ , 2] == 6  ## Logical vector for month = 6
+ValidRows124[June, ]  ## the matrix with extracted rows only
+
+mean(ValidRows124[June, ][ , 1]) 
+    ## mean of the first column of the matrix with extracted rows only
+```  
+
+```{r}
+## What was the maximum ozone value in the month of May (i.e. Month is equal to 5)?
+quiz <- read.csv(file = "hw1_data.csv")  ##reading file
+Ozone <- quiz[ , 1]  ## list of column 1, Ozone
+Month <- quiz[ , 5]  ## list of column 5, Month
+
+Truncated <- cbind(Ozone, Month)  ## merge into new matrix
+Cleanrows <- complete.cases(Truncated)
+                 ## logical vector for complete rows
+ValidRows124 <- Truncated[Cleanrows, ]  ## extract complete rows
+
+May <- ValidRows124[ , 2] == 5  ## Logical vector for month = 5
+ValidRows124[May, ]  ## the matrix with extracted rows only
+
+max(ValidRows124[May, ][ , 1]) 
+    ## mean of the first column of the matrix with extracted rows only
+
+```  
 
 
 
