@@ -618,8 +618,11 @@ x[u]  ## subsetting using a logical vector as an index
 ### Subsetting Lists  
 ```{r}
 x <- list(foo = 1:4, bar = 0.6, baz = "hello")
+x
 x[1]  ## extract 1st element, same class as original (a list)
+class(x[1])
 x[[1]] ## extract 1st element as just a sequence
+class(x[[1]])
 x$bar ## gives element associated with name "bar"
 x[["bar"]] ## same as above
 x["bar"] ## same as x[1], returns it as a list
@@ -792,6 +795,22 @@ mean(ValidRows124[OandTTest, ][ , 3])
       ## taking the mean of the third column of the resulting matrix
 ```  
 
+**Event Better**
+```{r}
+## Extract the subset of rows of the data frame where Ozone values are above 31 and Temp values are above 90. What is the mean of Solar.R in this subset?
+
+quiz <- read.csv(file = "hw1_data.csv")  ##reading file
+x <- quiz[quiz$Ozone > 31 & quiz$Temp > 90,]
+   ## Subset of data frame where row elements labeled "Ozone" 
+   ## (column label) are bigger than 31, and rows labeled 
+   ## "Temp" (column label) are bigger than 90. 
+x[!is.na(x$Ozone), ]
+   ## subset of rows, in which th elements labeled "Ozone"
+   ## are NOT NAs
+mean(x[!is.na(x$Ozone),"Solar.R"]) ## mean of column "Solar.R"
+```
+
+
 ```{r}
  ## What is the mean of "Temp" when "Month" is equal to 6? 
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
@@ -809,6 +828,19 @@ ValidRows124[June, ]  ## the matrix with extracted rows only
 mean(ValidRows124[June, ][ , 1]) 
     ## mean of the first column of the matrix with extracted rows only
 ```  
+
+**Better**
+```{r}
+ ## What is the mean of "Temp" when "Month" is equal to 6? 
+quiz <- read.csv(file = "hw1_data.csv")  ##reading file
+
+quiz[quiz$Month == 6, "Temp"]
+  ## Subset elements of column "Temp", on rows where elements 
+  ## labeled "Month" are equal to 6.
+mean(quiz[quiz$Month == 6, "Temp"])
+```
+
+
 
 ```{r}
 ## What was the maximum ozone value in the month of May (i.e. Month is equal to 5)?
@@ -828,6 +860,23 @@ max(ValidRows124[May, ][ , 1])
     ## mean of the first column of the matrix with extracted rows only
 
 ```  
+
+**Better**
+```{r}
+## What was the maximum ozone value in the month of May (i.e. Month is equal to 5)?
+quiz <- read.csv(file = "hw1_data.csv")  ##reading file
+
+quiz[quiz$Month == 5, "Ozone"]
+  ## extracts the column "Ozone" from the rows where elements 
+  ## labeled "Month" are equal to 5
+  ## NAs are still present
+
+quiz[quiz$Month == 5 & !is.na(quiz$Ozone), "Ozone"]
+  ## add onto that a logical vector to remove NAs
+
+max(quiz[quiz$Month == 5 & !is.na(quiz$Ozone), "Ozone"])
+```
+
 
 
 # Swirl Exercises Week 1  
@@ -890,3 +939,25 @@ paste(LETTERS, 1:4, sep = "-")
 
 
 ### Swirl lesson 5: Missing Values  
+ - *rnorm(1000)* to create a vector with 1000 draws from a standard normal distribution.  
+ - *sample(y, 100)* takes 100 values at random from vector y.  
+
+### Swirl lesson 6: Subsetting Vectors  
+ - *x[!is.na(x)]* shorthand to remove NAs  
+ - *x[c(3, 20, 21)]* picks the 3rd, 20th and 21st elements of x  
+ - *x[-c(3, 20, 21)]* picks all elements of x, except the 3rd, 20th and 21st.  
+ - **Named elements in vectors**  
+```{r}
+c(foo = 11, bar = 2, norf = NA)  ## named from start
+vect <- c(11, 2, NA)
+names(vect) <- c("foo", "bar", "norf")  ## named after existing
+vect
+```  
+ - *identical (x, y)* gives a logical vector of length 1  
+ 
+### Swirl lesson 7: Matrices and Data Frames  
+ - *dim(x)* gives the dimensions of an object. For a vector, that's NULL. Rows, then Columns.  
+  - *length(x)* works for vectors.  
+ - giving dimensions to a vector will make it into a matrix  
+ - *colnames()* can call or set the names of columsn in a data frame  
+  - *colnames(my_data) <- c("patient", "age", "weight", "bp", "rating", "test")*  
