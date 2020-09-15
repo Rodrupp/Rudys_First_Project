@@ -9,13 +9,13 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Week 1
+# Data Scientist's Toolsbox Week 1
  **What is Data Science?**
  0:43 - 0:56
   They state that a data scientist is broadly defined as someone who combines the skills of software programmer, statistician, and storyteller/artists to extract the nuggets of gold hidden under mountains of data.
 
 
-# Week 2
+# Data Scientist's Toolsbox Week 2
  **R Studio tour**  
  
 ```{r}
@@ -87,7 +87,7 @@ help(package = "ggplot2")
  You should see that there are two included vignettes: “Extending ggplot2” and “Aesthetic specifications.” Exploring the Aesthetic specifications vignette is a great example of how vignettes can be helpful, clear instructions on how to use the included functions.
 
 
-# Week 3: 
+# Data Scientist's Toolsbox Week 3 
 
  **Version control (Git & GitHub) Vocabulary**
 
@@ -126,7 +126,7 @@ Commit to save your changes locally, and add explanations of what has been chang
  Paste these into the Terminal, then reload the repository page.
  
  
-# Week 4
+# Data Scientist's Toolsbox Week 4
  
 ## R Markdown Example
  
@@ -148,20 +148,20 @@ plot(pressure)
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-## R Markdown fromatting
+## R Markdown formatting
 
-To bold text use **bold**.  
+To bold text use double asterisks **bold**.  
 
-to make it italics use *italics*.  
+to make it italics use single asterisks *italics*.  
 
-to strikethrough text use ~~strikethrough~~  
+to strikethrough text use double tildes ~~strikethrough~~  
 
-# Header biggest
+Use # for headings: 
+ - # Biggest Header  
+ - ## Second biggest  
+ - ### Third heading 
 
-## Second biggest 
-
-### third heading. 
-
+Code boxes created with triple backdash ``` 
 ```{r}
 print("Testing some code here.")
 ```
@@ -186,6 +186,7 @@ Making bulletted lists:
  - i wonder what happens if i don't include two spaces?  
  - ok, here goes: 
  - did it work?  
+ -- indent bullets with a double dash  
  
  [This is a link to google](http://www.google.com/)
  
@@ -239,11 +240,20 @@ Making bulletted lists:
  
  Examples: Text files and documents, Websites and applications, Sensor data, Image Files, Audio files, Video files, Email Data, Social Media data.  
  
-### Before you can start looking for answers, you need to turn your unstructured data into a format that you can analyze.  
+**Before you can start looking for answers, you need to turn your unstructured data into a format that you can analyze.**  
  
  
-# R Console Input  
-Setting values
+# R Programming Week 1  
+
+**Learning Objectives**  
+ - Install R Stoduio and Packages, including Swirl  
+ - History of R and S  
+ - describe differences between atomic data types  
+ - Subset R objects using "[", "[[" and "$"  
+ - Understand coersion, implicit and explicit  
+ - Remove NAs from objects  
+
+## Setting values  
 ```{r}
 x <- 1  ##sets the value of x to 1
 x  ## prints the value of x
@@ -413,7 +423,7 @@ x
 ```  
 
 ## Missing Values  
-Denoted by NA (or NaN for undefined mathematical operations).  
+Denoted by NA "Not Available" (or NaN "Not a Number", for undefined mathematical operations).  
  - *is.na()* and *is.nan()* used to test objects.  
  - NA values can have classes also, eg Integer NA, character NA, etc.  
  - NaN value is also NA, but converse is not true  
@@ -463,7 +473,7 @@ m
 ```  
 
 
-# Reading Tabular Data  
+## Reading Tabular Data  
 Principal functions  
  - *read.table()*, *read.csv()* read text files in rows and columns and return a data frame in R  
  - *readLines()* reads lines of a text file, gives a character vector  
@@ -481,7 +491,7 @@ Analogous functions for writing data, in order:
  - *serialize()*  
  
 ### Reading files with read.table()  
-Common arguments:  
+Examine *?read.table* help file. Common arguments:  
  - *file()* name of file / path to file  
  - *header()* indicates if the first line is a header or not  
  - *sep()* indicates how columns are separated  
@@ -498,7 +508,7 @@ for moderately sized datasets, you can call read.table without any arguments oth
  
  However, giving R these arguments will make it runs more smoothly and predictably. *read.csv()* is an identical command except that the default separator is a comma instead of a space. CSV files are common outputs from excel files and many other programs.  
 
-## Reading Larger Datasets with read.table  
+### Reading Larger Datasets with read.table  
 Things to do to facilitate reading.  
  - Read the Help page carefully for read.table
  - Make a rough calculation of the memory required to store your dataset. Is it larger than the RAM on your computer? If so don't proceed.  
@@ -528,7 +538,7 @@ each numeric object required 8 bytes, stored in 64 bits of data.
  
  This is the RAW data. A bit more is required to read the data: rule of thumb is you require double the memory as the raw data.  
 
-## Other Text Formats  
+### Other Text Formats  
 Not in form of tables. Used to store more metadata, for example class of the data in each column. Work better in version control, as text files are more easily read by git. It can be easier to fix corruption in the file.  
 Downside: less space-efficient.  
 *dump()* and *dput()* to write, *source()* and *dget()* to read.  
@@ -553,7 +563,7 @@ y
 x
 ```  
 
-## Interfaces with other things  
+### Interfaces with other things  
 Establish connections with files, compressed files or other more exotic things.  
  - *file()*  
  - *gzfile()* file compressed with gzip  
@@ -600,9 +610,9 @@ This is another way to read data other than *read.Table* and *read.csv*.
 
 ## Subsetting
 extracting subsets of R objects  
- - [ always returns an object of the same class as the original. e.g. subsetting a vector makes a vector. Can be used to select more than one element.  
- - [[ used to extract elements of a list or dataframa. Can only extract a single element. Returned object won't necessarily be of the same class.  
- - S is used to extract elements of a list or dataframe by name. Similar to using [[  
+ - "[" always returns an object of the same class as the original. e.g. subsetting a vector makes a vector. Can be used to select more than one element.  
+ - "[[" used to extract elements of a list or dataframa. Can only extract a single element. Returned object won't necessarily be of the same class.  
+ - "$" is used to extract elements of a list or dataframe by name. Similar to using "[["  
 ```{r}
 x <- c("a", "b", "c", "c", "d", "a")
 x[1]
@@ -674,7 +684,7 @@ x[1, , drop = FALSE]  ## returns a matrix
 ```  
 
 ### Partial Matching
-Partial matching names is allowed with [[ and $  
+Partial matching names is allowed with "[[" and "$"  
 ```{r}
 x <- list(aardvark = 1:5, peter = 0.6, paul = 3.14)
 x$a  ## by default looks for a name that matches "a". 
@@ -714,10 +724,10 @@ airquality[good, ][1:6, ]
 ```  
 
 ## Vectorised Operations  
-Many operations in % are *vectorised*, making code more efficient, concise and easier to read.  
+Many operations in R are *vectorised*, making code more efficient, concise and easier to read.  
 ```{r}
 x <- 1:4; y <- 6:9
-x + y  ## ass 1st element of x to 1st element of y, 2nd to 2nd, etc.
+x + y  ## add 1st element of x to 1st element of y, 2nd to 2nd, etc.
 x > 2  ## compares all numbers to 2
 x >= 2
 y == 8  ## == tests for equality
@@ -736,9 +746,11 @@ x / y
 x %*% y  ## true matrix multiplication
 ```
 
-## Quiz Questions
+# Week 1 Quiz Questions
 ```{r}
-## Extract the subset of rows of the data frame where Ozone values are above 31 and Temp values are above 90. What is the mean of Solar.R in this subset?
+## Extract the subset of rows of the data frame where Ozone 
+## values are above 31 and Temp values are above 90. What is the 
+## mean of Solar.R in this subset?
 
 quiz <- read.csv(file = "hw1_data.csv")
 Ozone <- quiz[ , 1]  ## creating a list of column 1, Ozone
@@ -772,7 +784,9 @@ mean(BigTemp[ , 3])
 
 **A more elegant solution:**
 ```{r}
-## Extract the subset of rows of the data frame where Ozone values are above 31 and Temp values are above 90. What is the mean of Solar.R in this subset?
+## Extract the subset of rows of the data frame where Ozone 
+## values are above 31 and Temp values are above 90. What is the 
+## mean of Solar.R in this subset?
 
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
 Ozone <- quiz[ , 1]  ## list of column 1, Ozone
@@ -797,7 +811,9 @@ mean(ValidRows124[OandTTest, ][ , 3])
 
 **Event Better**
 ```{r}
-## Extract the subset of rows of the data frame where Ozone values are above 31 and Temp values are above 90. What is the mean of Solar.R in this subset?
+## Extract the subset of rows of the data frame where Ozone 
+## values are above 31 and Temp values are above 90. What is the 
+## mean of Solar.R in this subset?
 
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
 x <- quiz[quiz$Ozone > 31 & quiz$Temp > 90,]
@@ -843,7 +859,8 @@ mean(quiz[quiz$Month == 6, "Temp"])
 
 
 ```{r}
-## What was the maximum ozone value in the month of May (i.e. Month is equal to 5)?
+## What was the maximum ozone value in the month of May 
+## (i.e. Month is equal to 5)?
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
 Ozone <- quiz[ , 1]  ## list of column 1, Ozone
 Month <- quiz[ , 5]  ## list of column 5, Month
@@ -863,7 +880,8 @@ max(ValidRows124[May, ][ , 1])
 
 **Better**
 ```{r}
-## What was the maximum ozone value in the month of May (i.e. Month is equal to 5)?
+## What was the maximum ozone value in the month of May 
+## (i.e. Month is equal to 5)?
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
 
 quiz[quiz$Month == 5, "Ozone"]
@@ -881,7 +899,7 @@ max(quiz[quiz$Month == 5 & !is.na(quiz$Ozone), "Ozone"])
 
 # Swirl Exercises Week 1  
 
-### Swirl lesson 1: Basic Building Blocks
+## Swirl lesson 1: Basic Building Blocks
 New commands:  
 
  - *ls()* displays a list of all variables saved in the workspace  
@@ -895,7 +913,7 @@ x <- c(2, 23, 1)
 c(x, 21, x)
 ```  
 
-### Swirl lesson 2: Workspace and files
+## Swirl lesson 2: Workspace and files
  - *list.files()* displays a character vector with the names of files in the directory.  
  -- *path = * argument to choose directory. Default is *getwd()*  
  -- *?list.files* help page has useful information on arguments.
@@ -912,7 +930,7 @@ c(x, 21, x)
  - *file.path("folder1", mytest3.R")* Character vector that holds a path to a file from components, in a platform-independent way. Example returns *"folder1/mytest3.R"*  
  -- for example *dir.create(file.path("testdir2", "testdir3"), recursive = TRUE)* creates folder "testdir3" inside folder "testdir2".  
 
-### Swirl lesson 3: Sequences of Numbers  
+## Swirl lesson 3: Sequences of Numbers  
  - *1:20* gives a numerical vector of length 20. Numbers start at 1 and finish at 20, increments of 1.  
  -- *pi:10* also works. value of 10 is not reached.  
  - *seq(1, 10)* does the same, but has more arguments.  
@@ -924,7 +942,7 @@ c(x, 21, x)
  -- can also take a vector value. *rep(c(0, 1, 2), times = 10)*  
  -- alternatively, repeat each value with *rep(c(0, 1, 2), each = 10)*  
 
-### Swirl lesson 4: Vectors  
+## Swirl lesson 4: Vectors  
  - logical operators >, <, >=, <=, == and !=  
  - "A | B" means A OR B. "A & B" means A AND B  
  - !A is the negation of A and is TRUE when A is FALSE and vice versa.  
@@ -938,11 +956,11 @@ paste(LETTERS, 1:4, sep = "-")
 ```  
 
 
-### Swirl lesson 5: Missing Values  
+## Swirl lesson 5: Missing Values  
  - *rnorm(1000)* to create a vector with 1000 draws from a standard normal distribution.  
  - *sample(y, 100)* takes 100 values at random from vector y.  
 
-### Swirl lesson 6: Subsetting Vectors  
+## Swirl lesson 6: Subsetting Vectors  
  - *x[!is.na(x)]* shorthand to remove NAs  
  - *x[c(3, 20, 21)]* picks the 3rd, 20th and 21st elements of x  
  - *x[-c(3, 20, 21)]* picks all elements of x, except the 3rd, 20th and 21st.  
@@ -955,9 +973,232 @@ vect
 ```  
  - *identical (x, y)* gives a logical vector of length 1  
  
-### Swirl lesson 7: Matrices and Data Frames  
+## Swirl lesson 7: Matrices and Data Frames  
  - *dim(x)* gives the dimensions of an object. For a vector, that's NULL. Rows, then Columns.  
   - *length(x)* works for vectors.  
  - giving dimensions to a vector will make it into a matrix  
  - *colnames()* can call or set the names of columsn in a data frame  
   - *colnames(my_data) <- c("patient", "age", "weight", "bp", "rating", "test")*  
+  
+# R Programming Week 2: Programming with R  
+ **Learning Objectives**  
+ 
+ - write if-else expressions.  
+ - write "for", "while" and "repeat" loops  
+ - define a function and specify its return value  
+ - describe how R binds a value to a symbol via the search list  
+ - explain lexical scoping with respect to how the value of free variables are resolved.  
+ - describe the difference between lexical scoping and dynamic scoping rules.  
+ - convert character strings representing date & time to an R datetime object.  
+ 
+## Control Structures  
+allow you to control the flow of execution of a program. For example:  
+
+ - *if*, *else* tests a condition.  
+ - *for* repeat a fixed number of times.  
+ - *while* repeat while a condition is true.  
+ - *repeat* repeats indefinitely.  
+ - *break* stops the execution of a loop.  
+ - *next* skips one iterations.  
+ - *return* exists a function.  
+
+These are used when writing programs. When writing on the command line, there are a separate set of functions with *apply* which are more useful for loops.
+ 
+### if, else  
+The "else" argument is not necessary.
+```{r}
+x <- rnorm(1, mean = 3)
+x
+if(x>3) {
+        y <- 10
+} else {
+        y <- 0
+}
+y
+```  
+Can also be written as:
+```{r}
+x <- rnorm(1, mean = 3)
+x
+y <- if(x>3) {
+             10
+} else {
+             0
+}
+y
+```  
+
+### "For" loops  
+*for* loops take an interator variable and assign it successive values from a sequence of a vector. Most commonly used for iterating over the elements of an object.  
+```{r}
+for(i in 1:10) {
+                print(i*2)
+}  ## a simple example
+
+x <- c("a", "b", "c", "d", "e")
+for (i in 1:4) {
+                print(x[i])
+  }  ## subsetting x with i to give the first 4 elements of x
+
+for(i in seq_along(x)) {
+                        print(x[i])
+}  ## seq_along gives all the elements
+
+for(letter in x) {
+                  print(letter)
+}  ## here "letter" is just an object. Gives all values.
+
+for(i in 1:4) print(x[i]) ## in the same line, the "{" is not needed.
+```  
+
+They can also be nested:  
+```{r}
+x <- matrix(1:6, 2, 3)
+x
+for(i in seq_len(nrow(x))) {
+     ## seq_len creates an integer sequence up to the length of the
+     ## object. In this case, the number of rows of x, so the
+     ## sequence is 1 2.
+          for(j in seq_len(ncol(x))) {
+            ## here seq_len will create the sequence 1 2 3, 
+            ## as there are 3 columns.
+                  print(x[i, j])
+            ## as i and j change, here they are the same as the row
+            ## and column from the matrix. the subsetting will
+            ## extract only one element.
+          }
+}
+```  
+Nesting loops beyond 2 or 3 levels can be very difficult to read.
+
+### "While" Loops
+The loop begins by testing a condition, and if it's true, runs the code. It then tests the condition again before each iteration.  
+```{r}
+count <- 0
+while(count < 10) {
+                  print(count)
+                  count <- count + 1
+}
+```  
+Can become infinite if not well written. Be careful.  
+
+There can be more than one condition in the test
+```{r}
+z <- 5
+while(z >= 3 && z <= 10) {
+          coin <- rbinom(1, 1, 0.5)  ## set to 1 or 0 randomly
+          print(c(z, coin)) ## print value and coin result
+          if(coin == 1) {
+                    z <- z + 1
+          } else {
+                    z <- z - 1
+          }     ## step up or down at random until a value is reached
+                ## that doesn't meet the conditions.
+}
+```  
+Conditions are evaluated left to right.  
+
+### "Repeat" Loops, "Next" and "Break"  
+Repeat is not frequently used because it continues to run forever, or until *break* is called within it (typically inside an if function). 
+```{r}
+x0 <- 10000
+tol <- 1
+
+repeat {
+        x1 <- sample(-x0:x0, 1)
+        print(c("x is ", x1), quote = FALSE)
+        if(abs(x1 - x0) <= tol) {
+           ## breaks the loop in the two values are within a
+           ## tolerance limit set as tol
+                break
+        } else {
+        x0 <- x1
+        }
+}
+```  
+It's safer to use a *for* loop with many iterations, then report whether a break was achieved or not.  
+```{r}
+x0 <- 10000
+tol <- 1
+conv <- "Convergeance has NOT been achieved"
+
+for(i in 1:10) {
+        x1 <- sample(-x0:x0, 1)
+        print(c("x is ", x1), quote = FALSE)
+        if(abs(x1 - x0) <= tol) {
+                print(c(i, "iterations"), quote = FALSE)
+                conv <- "Convergeance HAS been achieved"
+                break
+        } else {
+        x0 <- x1
+        }
+}
+print(conv)
+```  
+This way, if there's a problem with the code, the program will still finish and give you an end. *return* can also finish a loop, but also finishes any functions. Will return to this argument later.  
+
+*Next* can skip one iteration of a loop. E.g.:  
+```{r}
+for(i in 1:30) {
+            if(i <= 10) {
+                    next
+                    ## skips first 10 iterations
+            }
+            print(i)
+}
+```  
+
+## Functions  
+Functions are typically held in a separate text file. 
+```{r}
+source("My_Functions.R")
+
+## a simple function that adds 2 numbers together
+add2(286, 365)
+
+## a simple function that gives all elements of a vector that are 
+## higher than a threshold. Default threshold is 10.
+above(1:20)
+
+## This function gives the mean value of each column in a matrix 
+## or data frame. NAs are removed by default, but this can be turned 
+## off
+columnmean(airquality)
+```  
+
+Functions are stored as R objects, with class "function". They are "first class objects", which means they can be treated similarly to other objects. They can be passed as arguments in other functions and they can be nested.  
+**The return value of a function is the last expression in its body to be evaluated.**
+ 
+Not all arguments of a function must be included. They may have default values, and they may be called by name or position. E.g.:  
+```{r}
+mydata <- rnorm(100)
+## consider the sd function, that calculates standard deviations.
+sd(mydata)
+sd(x = mydata)
+sd(x = mydata, na.rm = FALSE)
+sd(na.rm = FALSE, x = mydata)
+sd(na.rm = FALSE, mydata)
+   ## in th last example, the order is changed. it might work but
+   ## is not recommended.
+```  
+Positional matching and matching by name can be mixed, which is useful for long list of arguments. E.g.:  
+```{r}
+mydata <- data.frame(x = 1:50, y = sequence(50, from = 27, by = 2))
+
+args(lm)
+y <- 10
+x <- 2
+  ## the lm() functions has many arguments, some of which 
+  ## have defaults
+lm(y ~ x, mydata, 1:100, model = FALSE)
+lm(data = mydata, y ~ x, model = FALSE, 1:100)
+  ## both commands give the same result. But mixing matching is 
+  ## not recommended.
+```  
+Function arguments can also be partially matched for a named argument. When an argument is given, the program will, in order, attempt to match:  
+ 1. an exact name  
+ 2. a partial match  
+ 3. a positional match  
+ 
+
+
