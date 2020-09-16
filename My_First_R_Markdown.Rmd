@@ -1200,5 +1200,193 @@ Function arguments can also be partially matched for a named argument. When an a
  2. a partial match  
  3. a positional match  
  
+In addition, you can also set an argument to *NULL*. It can mean a variety of things.  
+```{r}
+source("My_Functions.R")
+args(above)
+above(1:20, n = NULL)
+```  
 
+The arguments to a function are only evaluated as they are needed.  
+```{r, error = TRUE }
+f <- function(a, b) {
+        a^2
+}
+f(2)  
+        ## even though argument b is undefined and has no default, 
+        ## it still gives a logical value, because argument b is 
+        ## not used.
+
+f <- function(a, b) {
+        print(a)
+        print(b)
+}
+f(2)  
+        ## error only occurs when b is needed. the function 
+        ## works correctly up to then.
+```  
+
+### The "..." Argument  
+Indicates a variable number of arguments which are usually passed onto another function. Often used to extend another function, without copying the entire list of arguments from that function.  
+```{r}
+myplot <- function(x, y, type = "l", ...) {
+            plot(x, y, type = type, ...)
+}  ## imitates plot functions, but sets type to "l" by default.
+```  
+Generic functions use ... so that extra arguments can be passed to methods (more on this later).
+
+It is also necessary when the number of arguments cannot be known in advance.  
+```{r}
+args(paste)
+x <- "Hello"
+y <- "world!"
+z <- "I'm"
+w <- "R!"
+paste(x, y, z, w, sep = " ", collapse = NULL, recycle0 = FALSE)
+      ## several arguments can be placed in the ... position.
+
+args(cat)  ## similar function
+```
+You **CANNOT** use positional matching nor partial matching for arguments that come after the "..."  
+
+## Scoping Rules  
+### Symbol Binding
+What happens if you assign a function string that already exists?  
+```{r}
+lm <- function(x) x * x
+lm(5)
+```  
+the *lm()* function already exists and is defined in the stats package. But R will first search for the meaning of lm in the *global environment* (the workspace and objects set by the user). After that it works through a list of other environments in order, until it find it. The list can be viewed with the *search()* function.  
+```{r}
+search()
+```  
+Order matters! Can be configured by the user. When loading a package with the *library()* function, that package gets put to position 2 in the list, after the global environment, and everything else is pushed down one level.  
+Note that R has separate namespaces for functions and non-functions. So it is possible to have an object named *c* and a function named *c*. (Though on the global environment there can only be one object named *c*)
+
+### R Scoping Rules
+ - Determine how a value is associated with a free variable in a function  
+ - *lexical* aka *static* scoping. (an alternative is *dynamic* scoping)  
+ - R uses the *search* list to bind a value to a symbol  
+ - *lexical scoping* is particularly useful for sumplifying statistical computations.  
+```{r}
+f <- function(x, y) {
+            x^2 + y / z
+}
+```  
+How does R assign a value to *z*, if it's not defined in the function header?  
+
+ - *the values of free variables are searched for in the environment in which the function was defined.*  
+ -- An environment is a collection of (symbol, value) pairs  
+ -- every environment has a parent environment, and can have multiple children environments.  
+ -- the only environment without a parent is the empty environment  
+ -- a function + an environment = a closure (or function closure)  
+ - First R searches for the free variable in the environment of the function. It then continues searching in the parent environment.  
+ - the search continues down the sequence until it reaches the top-level environment.  
+ - after that, it continues down the *search* list until it hits the empty environment. If no value is found, an error is shown.  
+```{r}
+make.power <- function(n) {
+                pow <- function(x) {
+                          x^n
+                }
+                pow
+}  ## this function returns another function as its value. 
+   ## so i can use:
+cube <- make.power(3)
+square <- make.power(2)
+   ## to make functions "cube" and "square" that call "pow" 
+   ## with a value
+cube(5)
+square(5)
+```  
+ - *ls(environment())* can be used to call the environment of a function. (*ls()* lists objects.)  
+ - *get()* returns the value of an object, and can be used to find the value of arguments of a function, e.g.:  
+```{r}
+ls(environment(cube))
+get("n", environment((cube)))
+
+ls(environment(square))
+get("n", environment((square)))
+```  
+
+**What does this mean?**
+```{r}
+y <- 10
+f <- function(x) {
+          y <- 2
+          y^2 + g(x)
+}
+
+g <- function(x) {
+          y * x
+}
+f(3)  
+        ## results in 34 because y is set to 2 in the function f, 
+        ## but not in the function g
+g(3)  
+        ## results in 30 because the environment of g doesn't 
+        ## include setting y to 2.
+```  
+ - in *lexical* scoping the value of y is looked up in the environment where the function is defined.  
+ - in *dynamic* scoping the value of y is looked up in the environment where the function is **called** (known as "calling environment")  
+ -- in R this is called the "parent frame"  
+
+**Consequences of Lexical Scoping**  
+
+ - In R all objects must be stored in memory.  
+ - functions must carry a pointer to their respective environments, which could be anywhere.  
+ - In S-PLUS, for comparison, free variables are always looked up in the global workspace. So everything can be stored in the disk, because the "defining environment" of all functions was the same.  
+ 
+## Coding Standards  
+ Making code readable.  
+ 
+ - write your code using a text editor and save it as a text file.  
+ -- these can be read by any editing program.  
+ - indent your code. (8 spaces per tab?)  
+ - limit the width of your code.(80 columns?).  
+ -- forces you to limit nesting loops, which is not very readable.  
+ - limit the length of individual functions: one basic activity.  
+ -- helps you debug functions and which function is malfunctioning.  
+ 
+## Dates and Times in R  
+Represented using special object classes:  
+
+ - Dates are represented by the *Date* class  
+ -- Dates are stored internally as the number of days since 1970-01-01  
+ - Times are represented by the *POSIXct* or the *POSIXlt* class  
+ -- Times are stored internally as the number of seconds since 1970-01-01  
+ -- *POSIXct* is stored internally as a large integer, and is useful for storing times in something like a data frame  
+ -- *POSIXlt* is stored internally as a list, and includes other information such as day of the week, day of the year, day of the month.  
+ -- Functions that work on dates and times:  
+ --- *weekdays*  
+ --- *months*  
+ --- *quarters*  
+```{r,  error = TRUE }
+x <- as.Date("1970-01-01")
+x
+unclass(x)
+unclass(as.Date("1970-01-02"))
+unclass(as.Date("1969-12-31"))
+
+y <- Sys.time()
+y
+
+p <- as.POSIXlt(y)
+names(unclass(p))
+
+p$sec
+p$yday
+
+y  ## Sys.time() is already in POSIXct format
+unclass(x)
+x$sec  ## returns error since it is stored as only an integer
+```  
+The *strptime* function helps convert dates and times written in different formats.  
+```{r}
+datestring <- c("January 10, 2020 16:45", "September 26, 1986 03:21")
+x <- strptime(datestring, "%B %d, %Y %H:%M")
+x
+class(x)
+## use the help page to remember what the strings are
+```  
+You can use data and time objects to perform calculations, comparisons, etc. But they must be the same class. The operators keep track of tricky things like leap years and time-zones. Plotting functions also recognise date & time objects and interpret them in unique ways.  
 
