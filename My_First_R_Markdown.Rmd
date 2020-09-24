@@ -1536,3 +1536,171 @@ cr <- corr("specdata")
 summary(cr)
 length(cr)
 ```  
+
+# Swirl Exercises Week 2  
+## Swirl Lesson 8: Logic  
+ - Logical operators *==*, *!=*, *>*, *>=*, *<*, *<=*  
+ -- *%%* is used to find the remainder.
+ - *"!"* in front of a *TRUE* returns a *FALSE* and vice-versa  
+```{r}
+15 %% 7
+TRUE == TRUE
+(FALSE == TRUE) == FALSE
+5 != 7
+! 5 == 7
+!(0 >= -1)
+(TRUE != FALSE) == !(6 == 7)
+```  
+ - *"&"* and *"&&"* return TRUE only if both parts are TRUE  
+ -- *"&"* evaluates each element in a vector (recycling may happen).  
+ -- *"&&"* evaluates only the first element of vectors.  
+ - *"|"* and *"||"* return TRUE if either parts are TRUE  
+ -- same differences as for *"&"* and *"&&"*  
+ - All **AND** operators are evaluated before **OR** operators.  
+```{r}
+TRUE & TRUE
+FALSE & TRUE
+FALSE & FALSE
+TRUE & c(TRUE, FALSE, FALSE)
+TRUE && c(TRUE, FALSE, FALSE)
+6 != 10 && FALSE && 1 >= 2
+5 > 8 || 6 != 8 && 4 > 3.9
+```  
+ - *isTRUE()* returns TRUE only if the argument inside is *TRUE*, otherwise it returns *FALSE*.  
+ - *identical()* returns TRUE is both arguments are identical.  
+ - *xor()* is the exclusive **OR**. It returns TRUE if only one element is TRUE.  
+ - *which()* takes a logical vector as argument and returns the indeces of TRUE elements.  
+ - *any()* and *all()* return TRUE if any or all elements of a logical vector are TRUE, respectively.  
+```{r}
+isTRUE("egg salad")
+isTRUE(5 != 4)
+identical("hello", "Hello")
+xor(5 == 6, !FALSE)
+xor(5 <= 6, 4*3 == 12)
+which(c(TRUE, FALSE, TRUE))
+any(c(1, 2, 3, 4, 5, 6) < 0)
+all(c(1, 2, 3, 4, 5, 6) > 0)
+
+```  
+ 
+## Swirl Lesson 9: Functions  
+### Functions as arguments  
+You can pass functions as arguments to other functions just like you can pass data to functions. Let's say you define the following functions:  
+```{r}
+add_two_numbers <- function(num1, num2){
+    num1 + num2
+}
+
+multiply_two_numbers <- function(num1, num2){
+  num1 * num2
+}
+
+some_function <- function(func){
+    func(2, 4)
+}
+
+some_function(add_two_numbers)
+some_function(multiply_two_numbers)
+some_function(paste)
+```
+As you can see we use the argument name "func" like a function inside of "some_function()."  
+ 
+Finish the function definition below so that if a function is passed into the "func" argument and some data (like a vector) is passed into the dat argument the evaluate() function will return the result of dat being passed as an argument to func.  
+```{r}
+evaluate <- function(func, dat){
+  func(dat)
+}
+
+evaluate(sum, c(2, 4, 6))
+evaluate(median, c(7, 40, 9))
+evaluate(floor, 11.1)
+```  
+
+### Ellipses as arguments
+The ellipses can be used to pass on arguments to other functions that are used within the function you're writing. Usually a function that has the ellipses as an argument has the ellipses as the last argument. The usage of such a function would look like: *ellipses_func(arg1, arg2 = TRUE, ...)*  
+In the above example arg1 has no default value, so a value must be provided for arg1. arg2 has a default value, and other arguments can come after arg2 depending on how they're defined in the ellipses_func() documentation. Interestingly the usage for the paste function is as follows:  
+*paste (..., sep = " ", collapse = NULL)*  
+Notice that the ellipses is the first argument, and all other arguments after the ellipses have default values. This is a strict rule in R programming: all arguments after an ellipses must have default values. Take a look at the simon_says function below:  
+```{r}
+simon_says <- function(...){
+   paste("Simon says:", ...)
+}
+simon_says("put your hands on your head!")
+```  
+
+Telegrams used to be peppered with the words START and STOP in order to demarcate the beginning and end of sentences. Write a function below called  telegram that formats sentences for telegrams. For example the expression `telegram("Good", "morning")` should evaluate to:
+*"START Good morning STOP"*  
+```{r}
+telegram <- function(...){
+  paste("START", ..., "STOP")
+}
+telegram("Good", "morning")
+```  
+
+### Unpacking Elipses  
+Let's explore how to "unpack" arguments from an ellipses when you use the ellipses as an argument in a function. Below I have an example function that is supposed to add two explicitly named arguments called alpha and beta.
+```{r}
+add_alpha_and_beta <- function(...){
+   # First we must capture the ellipsis inside of a list
+   # and then assign the list to a variable. Let's name this
+   # variable `args`.
+
+   args <- list(...)
+
+   # We're now going to assume that there are two named arguments within args
+   # with the names `alpha` and `beta.` We can extract named arguments from
+   # the args list by using the name of the argument and double brackets. The
+   # `args` variable is just a regular list after all!
+   
+   alpha <- args[["alpha"]]
+   beta  <- args[["beta"]]
+
+   # Then we return the sum of alpha and beta.
+
+   alpha + beta 
+}
+
+add_alpha_and_beta(alpha = 100, beta = 20)
+```  
+
+Have you ever played Mad Libs before? The function below will construct a sentence from parts of speech that you provide as arguments. We'll write most of the function, but you'll need to unpack the appropriate arguments from the ellipses.
+```{r}
+mad_libs <- function(...){
+  # Do your argument unpacking here!
+  
+  args <- list(...)
+  place <- args["place"]
+  adjective <- args["adjective"]
+  noun <- args["noun"]
+  
+  # Don't modify any code below this comment.
+  # Notice the variables you'll need to create in order for the code below to
+  # be functional!
+  paste("News from", place, "today where", adjective, "students took to the streets in protest of the new", noun, "being installed on campus.")
+}
+mad_libs(place = "Christchurch", adjective = "uncool", noun = "Ski ramp")
+```  
+
+### Creating Binary Operators  
+The syntax for creating new binary operators in R is unlike anything else in R, but it allows you to define a new syntax for your function. I would only recommend making your own binary operator if you plan on using it often!  
+User-defined binary operators have the following syntax:  
+*%[whatever]%*  
+where [whatever] represents any valid variable name.  
+Let's say I wanted to define a binary operator that multiplied two numbers and then added one to the product. An implementation of that operator is below:  
+```{r}
+"%mult_add_one%" <- function(left, right){ # Notice the quotation marks!
+   left * right + 1
+}
+4 %mult_add_one% 5
+```  
+  
+Write your own binary operator below from absolute scratch! Your binary operator must be called %p% so that the expression:  
+"Good" %p% "job!"  
+will evaluate to: "Good job!"  
+```{r}
+"%p%" <- function(left, right){ 
+  paste(left, right)
+}
+"Hello" %p% "world!"
+```  
+
