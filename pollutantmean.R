@@ -3,10 +3,8 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
                 pollutant <- "sulfate"
         }  ## function accepts old spelling of sulphate
         
-        if(pollutant != "sulfate") {
-                if(pollutant != "nitrate") {
-                        return("Pollutant must be Sulfate or Nitrate")
-                }
+        if((pollutant != "sulfate") & (pollutant != "nitrate")) {
+                return("Pollutant must be Sulfate or Nitrate")
         }  ## returns error in case of wrong pollutant 
         
         filename_list <- list.files(path = directory) 
