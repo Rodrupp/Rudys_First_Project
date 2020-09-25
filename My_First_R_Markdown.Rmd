@@ -1704,3 +1704,36 @@ will evaluate to: "Good job!"
 "Hello" %p% "world!"
 ```  
 
+## Swirl Lesson 14: Dates and Times  
+ - *Sys.Date()* gets a date object with the current date  
+ - *as.Date("1986-09-26")* to create a custom date object  
+ -- use *unclass(Sys.Date())* to see that dates are stored as days since 1970-01-01.  
+ -- dates before 1970 are stored as negative numbers.  
+ - *Sys.time()* is a POSIXct object with the current time.  
+ -- time is stored internally as the number of seconds since 1970-01-01 00:00:00  
+ - *as.POSIXlt(Sys.time())* coerces it into a POSIXlt object  
+ -- it is stored internally as a list, with elements representing seconds, minutes, hours, day of month, month, year, day of week, day of year, daylight savings, time zone, and two more time zone related elements.  
+```{r}
+t1 <- as.POSIXlt("1986-09-26 12:45:00 BRT")
+str(unclass(t1))  ## str() Compactly displays structure of an object.
+t1$min  ## easily extracted elements
+```  
+ - *weekdays()* returns day of the week for any date or time object.  
+ - *months()* returns the month.  
+ - *quarters()* returns the quarter of th year.  
+ -- there functions work on date, POSIXct and POSIXlt objects.  
+```{r}
+t1 <- as.POSIXlt("1986-09-26 12:45:00 BRT")
+weekdays(t1)
+months(t1)
+quarters(t1)
+```  
+ - *strptime()* can extract dates and times from formats not recognised by R.  
+ -- it converts a character vector into POSIXlt.  
+```{r}
+t1 <- "October 17, 1986 08:24"
+strptime(t1, "%B %d, %Y %H:%M")
+```  
+ - arithmetic operations + and -, and comparisons <, > and == can be performed on date and time objects.  
+ - *difftime()* allows for more precise control of units when performing subtractions.  
+ 
