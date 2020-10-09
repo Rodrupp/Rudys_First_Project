@@ -1,0 +1,45 @@
+---
+title: "Mathematical Functions"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+x <- c(1, 2, 2, 3, 3, 4, 5, 6, 7, 7, 8, 9, 10, 10)
+sum(x)
+mean(x)
+unique(x)  ## eliminates duplicates
+summary(x)
+median(x)
+floor(x)
+sd(x)  ## standard deviation
+sqrt(x) ## square root
+abs(x) ## absolute value
+Inf  ## infinity, also possible in the negative
+NaN  ## Not a number, such as 0/0
+
+
+
+quantile(x, c(0, 0.25, 0.5, 0.75, 1))  ## quartiles, percentiles, deciles...
+
+signif(x) ## rounds to significant figures
+
+rep(2, 4)  ## repeats a number, n amount of times
+gl(3, 10)  ## generates a numeric vector, elements are 1 repeated k times,
+                ## then 2 repeated k times, then 3, until the number is equal 
+                ## to n. 
+rnorm(10, 5, 2.1)  
+  ## generates n random numbers with mean and standard dev, based on a 
+  ## normal distribution.
+runif(10, 3, 13) 
+  ## generates n random numbers, with minimum and max set, based on a
+  ## uniform distribution.
+
+corr(x, runif(length(x), 0, 10))  ## calculates correlation between to vectors 
+
+
+```
+
