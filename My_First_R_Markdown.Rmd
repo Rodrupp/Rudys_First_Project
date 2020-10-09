@@ -1884,7 +1884,7 @@ args(tapply)
 ```{r}
 x <- c(rnorm(10), runif(10), rnorm(10,1)) ## runif is random of uniform dist.
 f <- gl(3, 10)  ## generates a numeric vector, elements are 1 repeated k times,
-                ## then 2 repeated k times, the 3, until the number is equal 
+                ## then 2 repeated k times, then 3, until the number is equal 
                 ## to n. 
 f
 tapply(x, f, mean)
@@ -1932,7 +1932,7 @@ sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
 sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE))
 ```  
 
-### Splitting on more thn one level  
+### Splitting on more than one level  
 Using two different factors for splitting.  
 ```{r}
 x <- rnorm(10)
@@ -2012,30 +2012,54 @@ The primary tools for debugging functions in R:
 ```{r, error = TRUE}
 mean(xxx)
 
-traceback()  ## has to be called immediately after error occurs
+## traceback()  ## has to be called immediately after error occurs
 ```  
 ```{r, error = TRUE}
 lm(xxx - yyy)
-traceback()  ## error actually occurred 4 levels deep. 
+## traceback()  ## error actually occurred 4 levels deep. 
 ```  
 Useful for giving details of errors to others, when asking for help.  
 
 ### Debug
 *debug* is hard to see in static form, but here's an example:  
 ```{r, error = TRUE}
-debug(lm)  ## prints out the full body of the next function, 
+# debug(lm)  ## prints out the full body of the next function, 
            ## then opens the browser.
 lm(xxx - yyy)
-Q
 ```  
 The browser acts just like a separate workspace. The environment of this workspace is the environment of the function. Type *n* and enter to run the next line. You can then use debug on a function inside that function to browse that function. 
 
 ### Recover
 ```{r, error = TRUE}
-options(error = recover)
+# options(error = recover)
   ## Sets a global option for this R session. 
 
 read.csv("nosuchfile")
 ```  
 Instead of getting the console back, you get a menu. This is similar to the output of the traceback function. Error occurred at 3rd level, so you can type 3 to browse the environment of that function.  
+
+# Swirl Exercises Week 3  
+## Swirl Lesson 10: lapply and sapply  
+These functions offer a concise and convenient means of implementing the **Split-Apply-Combine strategy** for data analysis. That means, the function will *split* up the data into smaller pieces, *apply* a function to each piece, then *combine* the results.  
+
+Consider a data frame with several columns representing measured variables and rows representing observations (for example countries where the measurements were taken). Suppose we want to know the class of object of each column. We could individually look it up with a subsetting function, but since we need to do this for many columns, we can use *lapply* to do it as a loop for all of them. *lapply(dataframe, class)* command will give a list of all the column names and the class of the object. *sapply* does the same, but, if possible, simplifies the result into a vector or matrix instead of a list.  
+
+## Swirl Lesson 11: vapply and tapply  
+*vapply* works similarly to *sapply*, however you specify the object class you want as an output. If the function cannot convert the object into that class, it throws an error. This can prevent significant problems in code, that might be caused by getting an unexpected return value from *sapply*.  
+```{r, error = TRUE}
+x <- data.frame(name = c("a", "b", "c", "d", "e"), min = runif(5, 0, 10), max = runif(5, 10, 200), tree = c(TRUE, FALSE, FALSE, FALSE, FALSE), num = 1:5)
+x
+sapply(x, class)
+vapply(x, class, character(1))
+vapply(x, class, numeric(1))  ## error produced because output is not numeric
+```  
+
+*tapply* splits the data up into groups, based on the value of a variable vector, then applies a function to each group.  
+```{r}
+x <- data.frame(fus = runif(30), roh = runif(30), dah = runif(30), dborn = gl(5, 6))
+x
+tapply(x$fus, x$dborn, mean) 
+  ## takes the mean of column "fus", but separated into the groups set 
+  ## by "dborn"
+```  
 
