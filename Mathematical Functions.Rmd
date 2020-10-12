@@ -40,6 +40,11 @@ runif(10, 3, 13)
 
 corr(x, runif(length(x), 0, 10))  ## calculates correlation between to vectors 
 
+m <- matrix(c(5, 1, 0,
+                3,-1, 2,
+                4, 0,-1), nrow=3, byrow=TRUE)
+solve(m) ## calculates the inverse matrix
+m %*% solve(m)  ## mathematical matrix multiplication
 
 ```
 
