@@ -45,9 +45,9 @@ matrix(c(1, 2, 3, 4, 5, 6, 7, 8), nrow = 4, ncol = 2)
  **Installing from GitHub **  
  You first must find the package you want on GitHub and take note of both the package name AND the author of the package. Check out [this guide](http://kbroman.org/pkg_primer/pages/github.html) for installing from GitHub:  
  
- - *install.packages("devtools")* - only run this if you don’t already have devtools installed.  
- - *library(devtools)* - loads the devtools package  
- - *install_github("author/package")* replacing “author” and “package” with their GitHub username and the name of the package.  
+ * *install.packages("devtools")* - only run this if you don’t already have devtools installed.  
+ * *library(devtools)* - loads the devtools package  
+ * *install_github("author/package")* replacing “author” and “package” with their GitHub username and the name of the package.  
 
  **Loading packages**  
  Installing a package does not make its functions immediately available to you. First you must load the package into R; to do so, use the *library()* function. For example:  
@@ -91,27 +91,27 @@ help(package = "ggplot2")
 
  **Version control (Git & GitHub) Vocabulary**
 
- - **Repository** online folder that contains the whole, shared project
+ * **Repository** online folder that contains the whole, shared project
 Commit to save your changes locally, and add explanations of what has been changed.  
- - **Push** upload changes made locally to the repository, and merge them.  
- - **Pull** download the most recent changes from the repository and merge with your local folder.  
- - **Staging** to commit files separately and add separate explanations to each section edited, in order to simplify looking at the change log.  
- - **Branch** your local files and edits, before you push them.  
- - **Merge** independent branches are joined together into a single file. May need manual control if the same section of the same file was edited differently in both branches.  
- - **Conflict** when branches have been edited in the same section and file, making automatic merging hard.  
- - **Clone** make a local copy of a whole Git repository’s files and all the change history.  
- - **Fork** make a personal copy of a repository that doesn’t affect the original.  
+ * **Push** upload changes made locally to the repository, and merge them.  
+ * **Pull** download the most recent changes from the repository and merge with your local folder.  
+ * **Staging** to commit files separately and add separate explanations to each section edited, in order to simplify looking at the change log.  
+ * **Branch** your local files and edits, before you push them.  
+ * **Merge** independent branches are joined together into a single file. May need manual control if the same section of the same file was edited differently in both branches.  
+ * **Conflict** when branches have been edited in the same section and file, making automatic merging hard.  
+ * **Clone** make a local copy of a whole Git repository’s files and all the change history.  
+ * **Fork** make a personal copy of a repository that doesn’t affect the original.  
 
  **Best Practices:**  
  
- - Purposeful, single issue commits  
- - Informative commit messages  
- - Pull and Push often  
+ * Purposeful, single issue commits  
+ * Informative commit messages  
+ * Pull and Push often  
  
  
- - Git username Rodrupp  
- - Git email rodrupp@gmail.com  
- - Git password: automatically generated on firefox.  
+ * Git username Rodrupp  
+ * Git email rodrupp@gmail.com  
+ * Git password: automatically generated on firefox.  
 
  **Linking an Existing Project with GitHub**
  Open Git Bash or Terminal and navigate to the directory containing your project files. Move around directories by typing cd ~/dir/name/of/path/to/file  
@@ -119,8 +119,8 @@ Commit to save your changes locally, and add explanations of what has been chang
 
  Go to GitHub.com, and again, create a new repository:  
  
- - 1) Make sure the name is the exact same as your R project;  
- - 2) Do NOT initialize a README file, .gitignore, or license.  
+ 1. Make sure the name is the exact same as your R project;  
+ 2. Do NOT initialize a README file, .gitignore, or license.  
 
  Find *“...push an existing repository from the command line”* and copy to clipboard. 
  Paste these into the Terminal, then reload the repository page.
@@ -181,12 +181,12 @@ Use Ctrl+shift+enter to run all lines in a chunk.
 
 Making bulletted lists:  
 
- - bullets must finish with two spaces  
- - this is an example  
- - i wonder what happens if i don't include two spaces?  
- - ok, here goes: 
- - did it work?  
- -- indent bullets with a double dash  
+ * bullets must finish with two spaces  
+ * this is an example  
+ * i wonder what happens if i don't include two spaces?  
+ * ok, here goes: 
+ * did it work?  
+  + indent bullets with a + sign  
  
  [This is a link to google](http://www.google.com/)
  
@@ -2066,6 +2066,7 @@ tapply(x$fus, x$dborn, mean)
 # Quiz Week 3
 Take a look at the 'iris' dataset that comes with R. The data can be loaded with the code:
 ```{r}
+rm(list = ls())
 library(datasets)
 data(iris)
 data(mtcars)
@@ -2103,14 +2104,61 @@ For this assignment, assume that the matrix supplied is always invertible.
 
 In order to complete this assignment, you must do the following:  
 
- - Fork the GitHub repository containing the stub R files at https://github.com/rdpeng/ProgrammingAssignment2 to create a copy under your own account.  
-    Clone your forked GitHub repository to your computer so that you can edit the files locally on your own machine.
-    Edit the R file contained in the git repository and place your solution in that file (please do not rename the file).
-    Commit your completed R file into YOUR git repository and push your git branch to the GitHub repository under your account.
-    Submit to Coursera the URL to your GitHub repository that contains the completed R code for the assignment.
+ * Fork the GitHub repository containing the stub R files at https://github.com/rdpeng/ProgrammingAssignment2 to create a copy under your own account. 
+ * Clone your forked GitHub repository to your computer so that you can edit the files locally on your own machine. 
+ * Edit the R file contained in the git repository and place your solution in that file (please do not rename the file). 
+ * Commit your completed R file into YOUR git repository and push your git branch to the GitHub repository under your account. 
+ * Submit to Coursera the URL to your GitHub repository that contains the completed R code for the assignment. 
 
-In addition to submitting the URL for your GitHub repository, you will need to submit the 40 character SHA-1 hash (as string of numbers from 0-9 and letters from a-f) that identifies the repository commit that contains the version of the files you want to submit. You can do this in GitHub by doing the following
+In addition to submitting the URL for your GitHub repository, you will need to submit the 40 character SHA-1 hash (as string of numbers from 0-9 and letters from a-f) that identifies the repository commit that contains the version of the files you want to submit. You can do this in GitHub by doing the following: 
+ 1. Going to your GitHub repository web page for this assignment. 
+ 2. Click on the “?? commits” link where ?? is the number of commits you have in the repository. For example, if you made a total of 10 commits to this repository, the link should say “10 commits”. 
+ 3. You will see a list of commits that you have made to this repository. The most recent commit is at the very top. If this represents the version of the files you want to submit, then just click the “copy to clipboard” button on the right hand side that should appear when you hover over the SHA-1 hash. Paste this SHA-1 hash into the course web site when you submit your assignment. If you don't want to use the most recent commit, then go down and find the commit you want and copy the SHA-1 hash. 
 
-    Going to your GitHub repository web page for this assignment
-    Click on the “?? commits” link where ?? is the number of commits you have in the repository. For example, if you made a total of 10 commits to this repository, the link should say “10 commits”.
-    You will see a list of commits that you have made to this repository. The most recent commit is at the very top. If this represents the version of the files you want to submit, then just click the “copy to clipboard” button on the right hand side that should appear when you hover over the SHA-1 hash. Paste this SHA-1 hash into the course web site when you submit your assignment. If you don't want to use the most recent commit, then go down and find the commit you want and copy the SHA-1 hash.
+```{r}
+## This function initializes the objects "x" and "inv", which will store a
+## matrix and its inverse, respectively. It then defines functions to "get" and
+## "set" the value of "x" and "inv", then outputs the four functions as a
+## list. makeCacheMatrix also serves as the parent environment for these 
+## functions. The "set" type functions can alter the values of "x" and "inv" 
+## in the parent environment with the double arrow assignment, and the "get"
+## functions, by default give the values of "x" and "inv" in the parent 
+## environment, since these objects are not defined in the "get" functions
+## themselves.
+
+makeCacheMatrix <- function(x = matrix()) {
+        inv <- NULL
+        set <- function(y = matrix()) {
+                x <<- y
+                inv <<- NULL
+        }
+        get <- function() x
+        setinv <- function(inverse) inv <<- inverse
+        getinv <- function() inv
+        list(set = set, get = get, setinv = setinv, getinv = getinv)
+}
+
+
+## the cacheSolve function takes as its argument an object produced by the 
+## makeCacheMatrix function, which has a matrix "x" stored in it. Firstly it
+## retreives the value of the inverted matrix, if there is one, then checks if
+## it's NULL. If there is a stored value, the function returns the stored value
+## along with a message to let the user know the cached value was used. 
+## Otherwise, it retrieved the matrix "x" from the makeCacheMatrix environment,
+## calculates the inverse matrix, stores it into said environment and returns
+## it.
+
+cacheSolve <- function(x, ...) {
+        ## Return a matrix that is the inverse of 'x'
+        inv <- x$getinv()
+        if(!is.null(inv)) {
+                print("Getting Cached Data")
+                return(inv)
+        }
+        matr <- x$get()
+        inv_matr <- solve(matr, ...)
+        x$setinv(inv_matr)
+        inv_matr
+}
+```
+
