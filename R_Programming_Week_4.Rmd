@@ -1,0 +1,11 @@
+---
+title: "R Programming Week 4"
+author: "Rudy Rupp"
+date: "13/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

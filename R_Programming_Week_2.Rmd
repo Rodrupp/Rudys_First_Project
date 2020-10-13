@@ -1,0 +1,733 @@
+---
+title: "R Programming Week 2"
+author: "Rudy Rupp"
+date: "13/10/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Programming Week 2: Programming with R  
+ **Learning Objectives**  
+ 
+ - write if-else expressions.  
+ - write "for", "while" and "repeat" loops  
+ - define a function and specify its return value  
+ - describe how R binds a value to a symbol via the search list  
+ - explain lexical scoping with respect to how the value of free variables are resolved.  
+ - describe the difference between lexical scoping and dynamic scoping rules.  
+ - convert character strings representing date & time to an R datetime object.  
+ 
+## Control Structures  
+allow you to control the flow of execution of a program. For example:  
+
+ - *if*, *else* tests a condition.  
+ - *for* repeat a fixed number of times.  
+ - *while* repeat while a condition is true.  
+ - *repeat* repeats indefinitely.  
+ - *break* stops the execution of a loop.  
+ - *next* skips one iterations.  
+ - *return* exists a function.  
+
+These are used when writing programs. When writing on the command line, there are a separate set of functions with *apply* which are more useful for loops.
+ 
+### if, else  
+The "else" argument is not necessary.
+```{r}
+x <- rnorm(1, mean = 3)
+x
+if(x>3) {
+        y <- 10
+} else {
+        y <- 0
+}
+y
+```  
+Can also be written as:
+```{r}
+x <- rnorm(1, mean = 3)
+x
+y <- if(x>3) {
+             10
+} else {
+             0
+}
+y
+```  
+
+### "For" loops  
+*for* loops take an interator variable and assign it successive values from a sequence of a vector. Most commonly used for iterating over the elements of an object.  
+```{r}
+for(i in 1:10) {
+                print(i*2)
+}  ## a simple example
+
+x <- c("a", "b", "c", "d", "e")
+for (i in 1:4) {
+                print(x[i])
+  }  ## subsetting x with i to give the first 4 elements of x
+
+for(i in seq_along(x)) {
+                        print(x[i])
+}  ## seq_along gives all the elements
+
+for(letter in x) {
+                  print(letter)
+}  ## here "letter" is just an object. Gives all values.
+
+for(i in 1:4) print(x[i]) ## in the same line, the "{" is not needed.
+```  
+
+They can also be nested:  
+```{r}
+x <- matrix(1:6, 2, 3)
+x
+for(i in seq_len(nrow(x))) {
+     ## seq_len creates an integer sequence up to the length of the
+     ## object. In this case, the number of rows of x, so the
+     ## sequence is 1 2.
+          for(j in seq_len(ncol(x))) {
+            ## here seq_len will create the sequence 1 2 3, 
+            ## as there are 3 columns.
+                  print(x[i, j])
+            ## as i and j change, here they are the same as the row
+            ## and column from the matrix. the subsetting will
+            ## extract only one element.
+          }
+}
+```  
+Nesting loops beyond 2 or 3 levels can be very difficult to read.
+
+### "While" Loops
+The loop begins by testing a condition, and if it's true, runs the code. It then tests the condition again before each iteration.  
+```{r}
+count <- 0
+while(count < 10) {
+                  print(count)
+                  count <- count + 1
+}
+```  
+Can become infinite if not well written. Be careful.  
+
+There can be more than one condition in the test
+```{r}
+z <- 5
+while(z >= 3 && z <= 10) {
+          coin <- rbinom(1, 1, 0.5)  ## set to 1 or 0 randomly
+          print(c(z, coin)) ## print value and coin result
+          if(coin == 1) {
+                    z <- z + 1
+          } else {
+                    z <- z - 1
+          }     ## step up or down at random until a value is reached
+                ## that doesn't meet the conditions.
+}
+```  
+Conditions are evaluated left to right.  
+
+### "Repeat" Loops, "Next" and "Break"  
+Repeat is not frequently used because it continues to run forever, or until *break* is called within it (typically inside an if function). 
+```{r}
+x0 <- 10000
+tol <- 1
+
+repeat {
+        x1 <- sample(-x0:x0, 1)
+        print(c("x is ", x1), quote = FALSE)
+        if(abs(x1 - x0) <= tol) {
+           ## breaks the loop in the two values are within a
+           ## tolerance limit set as tol
+                break
+        } else {
+        x0 <- x1
+        }
+}
+```  
+It's safer to use a *for* loop with many iterations, then report whether a break was achieved or not.  
+```{r}
+x0 <- 10000
+tol <- 1
+conv <- "Convergeance has NOT been achieved"
+
+for(i in 1:10) {
+        x1 <- sample(-x0:x0, 1)
+        print(c("x is ", x1), quote = FALSE)
+        if(abs(x1 - x0) <= tol) {
+                print(c(i, "iterations"), quote = FALSE)
+                conv <- "Convergeance HAS been achieved"
+                break
+        } else {
+        x0 <- x1
+        }
+}
+print(conv)
+```  
+This way, if there's a problem with the code, the program will still finish and give you an end. *return* can also finish a loop, but also finishes any functions. Will return to this argument later.  
+
+*Next* can skip one iteration of a loop. E.g.:  
+```{r}
+for(i in 1:30) {
+            if(i <= 10) {
+                    next
+                    ## skips first 10 iterations
+            }
+            print(i)
+}
+```  
+
+## Functions  
+Functions are typically held in a separate text file. 
+```{r}
+source("My_Functions.R")
+
+## a simple function that adds 2 numbers together
+add2(286, 365)
+
+## a simple function that gives all elements of a vector that are 
+## higher than a threshold. Default threshold is 10.
+above(1:20)
+
+## This function gives the mean value of each column in a matrix 
+## or data frame. NAs are removed by default, but this can be turned 
+## off
+columnmean(airquality)
+```  
+
+Functions are stored as R objects, with class "function". They are "first class objects", which means they can be treated similarly to other objects. They can be passed as arguments in other functions and they can be nested.  
+**The return value of a function is the last expression in its body to be evaluated.**
+ 
+Not all arguments of a function must be included. They may have default values, and they may be called by name or position. E.g.:  
+```{r}
+mydata <- rnorm(100)
+## consider the sd function, that calculates standard deviations.
+sd(mydata)
+sd(x = mydata)
+sd(x = mydata, na.rm = FALSE)
+sd(na.rm = FALSE, x = mydata)
+sd(na.rm = FALSE, mydata)
+   ## in th last example, the order is changed. it might work but
+   ## is not recommended.
+```  
+Positional matching and matching by name can be mixed, which is useful for long list of arguments. E.g.:  
+```{r}
+mydata <- data.frame(x = 1:50, y = sequence(50, from = 27, by = 2))
+
+args(lm)
+y <- 10
+x <- 2
+  ## the lm() functions has many arguments, some of which 
+  ## have defaults
+lm(y ~ x, mydata, 1:100, model = FALSE)
+lm(data = mydata, y ~ x, model = FALSE, 1:100)
+  ## both commands give the same result. But mixing matching is 
+  ## not recommended.
+```  
+Function arguments can also be partially matched for a named argument. When an argument is given, the program will, in order, attempt to match:  
+ 1. an exact name  
+ 2. a partial match  
+ 3. a positional match  
+ 
+In addition, you can also set an argument to *NULL*. It can mean a variety of things.  
+```{r}
+source("My_Functions.R")
+args(above)
+above(1:20, n = NULL)
+```  
+
+The arguments to a function are only evaluated as they are needed.  
+```{r, error = TRUE }
+f <- function(a, b) {
+        a^2
+}
+f(2)  
+        ## even though argument b is undefined and has no default, 
+        ## it still gives a logical value, because argument b is 
+        ## not used.
+
+f <- function(a, b) {
+        print(a)
+        print(b)
+}
+f(2)  
+        ## error only occurs when b is needed. the function 
+        ## works correctly up to then.
+```  
+
+### The "..." Argument  
+Indicates a variable number of arguments which are usually passed onto another function. Often used to extend another function, without copying the entire list of arguments from that function.  
+```{r}
+myplot <- function(x, y, type = "l", ...) {
+            plot(x, y, type = type, ...)
+}  ## imitates plot functions, but sets type to "l" by default.
+```  
+Generic functions use ... so that extra arguments can be passed to methods (more on this later).
+
+It is also necessary when the number of arguments cannot be known in advance.  
+```{r}
+args(paste)
+x <- "Hello"
+y <- "world!"
+z <- "I'm"
+w <- "R!"
+paste(x, y, z, w, sep = " ", collapse = NULL, recycle0 = FALSE)
+      ## several arguments can be placed in the ... position.
+
+args(cat)  ## similar function
+```
+You **CANNOT** use positional matching nor partial matching for arguments that come after the "..."  
+
+## Scoping Rules  
+### Symbol Binding
+What happens if you assign a function string that already exists?  
+```{r}
+lm <- function(x) x * x
+lm(5)
+```  
+the *lm()* function already exists and is defined in the stats package. But R will first search for the meaning of lm in the *global environment* (the workspace and objects set by the user). After that it works through a list of other environments in order, until it find it. The list can be viewed with the *search()* function.  
+```{r}
+search()
+```  
+Order matters! Can be configured by the user. When loading a package with the *library()* function, that package gets put to position 2 in the list, after the global environment, and everything else is pushed down one level.  
+Note that R has separate namespaces for functions and non-functions. So it is possible to have an object named *c* and a function named *c*. (Though on the global environment there can only be one object named *c*)
+
+### R Scoping Rules
+ - Determine how a value is associated with a free variable in a function  
+ - *lexical* aka *static* scoping. (an alternative is *dynamic* scoping)  
+ - R uses the *search* list to bind a value to a symbol  
+ - *lexical scoping* is particularly useful for sumplifying statistical computations.  
+```{r}
+f <- function(x, y) {
+            x^2 + y / z
+}
+```  
+How does R assign a value to *z*, if it's not defined in the function header?  
+
+ - *the values of free variables are searched for in the environment in which the function was defined.*  
+ -- An environment is a collection of (symbol, value) pairs  
+ -- every environment has a parent environment, and can have multiple children environments.  
+ -- the only environment without a parent is the empty environment  
+ -- a function + an environment = a closure (or function closure)  
+ - First R searches for the free variable in the environment of the function. It then continues searching in the parent environment.  
+ - the search continues down the sequence until it reaches the top-level environment.  
+ - after that, it continues down the *search* list until it hits the empty environment. If no value is found, an error is shown.  
+```{r}
+make.power <- function(n) {
+                pow <- function(x) {
+                          x^n
+                }
+                pow
+}  ## this function returns another function as its value. 
+   ## so i can use:
+cube <- make.power(3)
+square <- make.power(2)
+   ## to make functions "cube" and "square" that call "pow" 
+   ## with a value
+cube(5)
+square(5)
+```  
+ - *ls(environment())* can be used to call the environment of a function. (*ls()* lists objects.)  
+ - *get()* returns the value of an object, and can be used to find the value of arguments of a function, e.g.:  
+```{r}
+ls(environment(cube))
+get("n", environment((cube)))
+
+ls(environment(square))
+get("n", environment((square)))
+```  
+
+**What does this mean?**
+```{r}
+y <- 10
+f <- function(x) {
+          y <- 2
+          y^2 + g(x)
+}
+
+g <- function(x) {
+          y * x
+}
+f(3)  
+        ## results in 34 because y is set to 2 in the function f, 
+        ## but not in the function g
+g(3)  
+        ## results in 30 because the environment of g doesn't 
+        ## include setting y to 2.
+```  
+ - in *lexical* scoping the value of y is looked up in the environment where the function is defined.  
+ - in *dynamic* scoping the value of y is looked up in the environment where the function is **called** (known as "calling environment")  
+ -- in R this is called the "parent frame"  
+
+**Consequences of Lexical Scoping**  
+
+ - In R all objects must be stored in memory.  
+ - functions must carry a pointer to their respective environments, which could be anywhere.  
+ - In S-PLUS, for comparison, free variables are always looked up in the global workspace. So everything can be stored in the disk, because the "defining environment" of all functions was the same.  
+ 
+## Coding Standards  
+ Making code readable.  
+ 
+ - write your code using a text editor and save it as a text file.  
+ -- these can be read by any editing program.  
+ - indent your code. (8 spaces per tab?)  
+ - limit the width of your code.(80 columns?).  
+ -- forces you to limit nesting loops, which is not very readable.  
+ - limit the length of individual functions: one basic activity.  
+ -- helps you debug functions and which function is malfunctioning.  
+ 
+## Dates and Times in R  
+Represented using special object classes:  
+
+ - Dates are represented by the *Date* class  
+ -- Dates are stored internally as the number of days since 1970-01-01  
+ - Times are represented by the *POSIXct* or the *POSIXlt* class  
+ -- Times are stored internally as the number of seconds since 1970-01-01  
+ -- *POSIXct* is stored internally as a large integer, and is useful for storing times in something like a data frame  
+ -- *POSIXlt* is stored internally as a list, and includes other information such as day of the week, day of the year, day of the month.  
+ -- Functions that work on dates and times:  
+ --- *weekdays*  
+ --- *months*  
+ --- *quarters*  
+```{r,  error = TRUE }
+x <- as.Date("1970-01-01")
+x
+unclass(x)
+unclass(as.Date("1970-01-02"))
+unclass(as.Date("1969-12-31"))
+
+y <- Sys.time()
+y
+
+p <- as.POSIXlt(y)
+names(unclass(p))
+
+p$sec
+p$yday
+
+y  ## Sys.time() is already in POSIXct format
+unclass(x)
+x$sec  ## returns error since it is stored as only an integer
+```  
+The *strptime* function helps convert dates and times written in different formats.  
+```{r}
+datestring <- c("January 10, 2020 16:45", "September 26, 1986 03:21")
+x <- strptime(datestring, "%B %d, %Y %H:%M")
+x
+class(x)
+## use the help page to remember what the strings are
+```  
+You can use data and time objects to perform calculations, comparisons, etc. But they must be the same class. The operators keep track of tricky things like leap years and time-zones. Plotting functions also recognise date & time objects and interpret them in unique ways.  
+
+# Week 2 Quiz Questions  
+```{r}
+f <- function(x) {
+        g <- function(y) {
+                y + z
+        }
+        z <- 4
+        x + g(x)
+}
+z <- 10
+f(3)
+```
+
+# Week 2 Programming Assignment  
+## Part 1  
+Write a function named 'pollutantmean' that calculates the mean of a pollutant (sulfate or nitrate) across a specified list of monitors. The function 'pollutantmean' takes three arguments: 'directory', 'pollutant', and 'id'. Given a vector monitor ID numbers, 'pollutantmean' reads that monitors' particulate matter data from the directory specified in the 'directory' argument and returns the mean of the pollutant across all of the monitors, ignoring any missing values coded as NA. A prototype of the function is as follows:  
+```{r}
+##  pollutantmean <- function(directory, pollutant, id = 1:332) {
+                ## 'directory' is a character vector of length 1 indicating
+                ## the location of the CSV file.
+                
+                ## 'pollutant' is a character value of length 1 indicating
+                ## the name of the pollutant for which we will calculate the
+                ## mean; either "sulfate" or "nitrate". 
+                
+                ## 'id' is an integer vector indicating the monitor ID
+                ## numbers to be used
+                
+                ## Return the mean of the pollutant across all monitors list
+                ## in the 'id' vector (ignoring NA values_
+                ## NOTE: Do not round the result)
+##  }
+```  
+You can see some example output from this function below. The function that you write should be able to match this output. Please save your code to a file named pollutantmean.R.  
+
+[Sample results](https://d3c33hcgiwev3.cloudfront.net/_3b0da118473bfa0845efddcbe29cc336_pollutantmean-demo.html?Expires=1600473600&Signature=kmxefxIfSh~d58GQH7-acWeSAjn1d6oVB-aKqk8ZuY~2XXuWT1H9ERs2c-u6eS-osJNDcDHqdph4uEvS3cZnMMpfnrI3EgoTnKvkCzs4xbOtWugaKsuwZALETKeUleeE3Zmnbz9yiB96hZfBSVyZSwC1NoAELGVuDt0kuJ7ReS4_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A)
+```{r}
+source("pollutantmean.R")
+a <- pollutantmean("specdata", "sulphate", 1:10)
+b <- pollutantmean("specdata", "nitrate", 70:72)
+c <- pollutantmean("specdata", "nitrate", 23)
+c(a, b, c)
+```  
+
+## Part 2  
+Write a function that reads a directory full of files and reports the number of completely observed cases in each data file. The function should return a data frame where the first column is the name of the file and the second column is the number of complete cases. A prototype of this function follows:  
+```{r}
+complete <- function(directory, id = 1:322) {
+        ## 'directory' is a character vector of length 1 indicating
+        ## the location of the CSV files
+         
+        ## 'id' is an integer vector indicating the monitor ID numbers
+        ## to be used
+         
+        ## Return a data frame of the form:
+        ## id nobs
+        ## 1 117
+        ## 2 1041
+        ## ...
+        ## where 'id' is the monitor ID number and 'nobs' is the
+        ## number of complete cases.
+}
+```  
+You can see some example output from this function below. The function that you write should be able to match this output. Please save your code to a file named complete.R. To run the submit script for this part, make sure your working directory has the file complete.R in it.  
+
+[Sample results](https://d3c33hcgiwev3.cloudfront.net/_3b0da118473bfa0845efddcbe29cc336_complete-demo.html?Expires=1600992000&Signature=gF2NcTe77KzJFYL8nvEfhNJkJ5bsSS505uqCoL81tOOjBesuP1y-8ukQr1IwTArMjicmnA82chASNa-3eDHF~wyfs0yTa0Z2se6uawggD5~LDYVAJw-PcDlNfv~m3i4Ab3smdONOByevfvMYNMO8WGQ8SSv2l8fIbtPZayErCbI_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A)
+```{r}
+source("complete.R")
+complete("specdata", 1)
+complete("specdata", c(2, 4, 8, 10, 12))
+complete("specdata", 30:25)
+complete("specdata", 3)
+```  
+
+
+## Part 3  
+Write a function that takes a directory of data files and a threshold for complete cases and calculates the correlation between sulfate and nitrate for monitor locations where the number of completely observed cases (on all variables) is greater than the threshold. The function should return a vector of correlations for the monitors that meet the threshold requirement. If no monitors meet the threshold requirement, then the function should return a numeric vector of length 0. A prototype of this function follows:  
+```{r}
+corr <- function(directory, threshold = 0) {
+## 'directory' is a character vector of length 1 indicating the location of
+## the CSV files
+
+## 'threshold' is a numeric vector of length 1 indicating the number of 
+## completely observed observations (on all variables) required to compute
+## the correlation between nitrate and sulfate; the default is 0
+
+## return a numeric vector of correlations
+## NOTE: Do not round the result!
+}
+```  
+
+For this function you will need to use the 'cor' function in R which calculates the correlation between two vectors. Please read the help page for this function via '?cor' and make sure that you know how to use it.  
+
+You can see some example output from this function below. The function that you write should be able to approximately match this output. Note that because of how R rounds and presents floating point numbers, the output you generate may differ slightly from the example output. Please save your code to a file named corr.R. To run the submit script for this part, make sure your working directory has the file corr.R in it.  
+
+[Sample Results](https://d3c33hcgiwev3.cloudfront.net/_e92e575b8e62dcb1e3a086d2ff0d5a1e_corr-demo.html?Expires=1600992000&Signature=GmWEdZ-a~LTbW42FuTGEivk5yK5lHU1dL-W4feLDoYsxdhxJGQggsEsI1CghJfbDozGCmubCMgFJXyMpPD1YD8gl2ize7WZVH9X8MhsLE~2p4mGt7xS4KL88MtroisgJnZlg51TZxysolTJlKSTNZlB8sthzm5du2A9Zy7ugKYc_&Key-Pair-Id=APKAJLTNE6QMUY6HBC5A) 
+```{r}
+source("corr.R")
+source("complete.R")
+cr <- corr("specdata", 150)
+head(cr)
+summary(cr)
+cr <- corr("specdata", 400)
+head(cr)
+summary(cr)
+cr <- corr("specdata", 5000)
+summary(cr)
+length(cr)
+cr <- corr("specdata")
+summary(cr)
+length(cr)
+```  
+
+# Swirl Exercises Week 2  
+## Swirl Lesson 8: Logic  
+ - Logical operators *==*, *!=*, *>*, *>=*, *<*, *<=*  
+ -- *%%* is used to find the remainder.
+ - *"!"* in front of a *TRUE* returns a *FALSE* and vice-versa  
+```{r}
+15 %% 7
+TRUE == TRUE
+(FALSE == TRUE) == FALSE
+5 != 7
+! 5 == 7
+!(0 >= -1)
+(TRUE != FALSE) == !(6 == 7)
+```  
+ - *"&"* and *"&&"* return TRUE only if both parts are TRUE  
+ -- *"&"* evaluates each element in a vector (recycling may happen).  
+ -- *"&&"* evaluates only the first element of vectors.  
+ - *"|"* and *"||"* return TRUE if either parts are TRUE  
+ -- same differences as for *"&"* and *"&&"*  
+ - All **AND** operators are evaluated before **OR** operators.  
+```{r}
+TRUE & TRUE
+FALSE & TRUE
+FALSE & FALSE
+TRUE & c(TRUE, FALSE, FALSE)
+TRUE && c(TRUE, FALSE, FALSE)
+6 != 10 && FALSE && 1 >= 2
+5 > 8 || 6 != 8 && 4 > 3.9
+```  
+ - *isTRUE()* returns TRUE only if the argument inside is *TRUE*, otherwise it returns *FALSE*.  
+ - *identical()* returns TRUE is both arguments are identical.  
+ - *xor()* is the exclusive **OR**. It returns TRUE if only one element is TRUE.  
+ - *which()* takes a logical vector as argument and returns the indeces of TRUE elements.  
+ - *any()* and *all()* return TRUE if any or all elements of a logical vector are TRUE, respectively.  
+```{r}
+isTRUE("egg salad")
+isTRUE(5 != 4)
+identical("hello", "Hello")
+xor(5 == 6, !FALSE)
+xor(5 <= 6, 4*3 == 12)
+which(c(TRUE, FALSE, TRUE))
+any(c(1, 2, 3, 4, 5, 6) < 0)
+all(c(1, 2, 3, 4, 5, 6) > 0)
+
+```  
+ 
+## Swirl Lesson 9: Functions  
+### Functions as arguments  
+You can pass functions as arguments to other functions just like you can pass data to functions. Let's say you define the following functions:  
+```{r}
+add_two_numbers <- function(num1, num2){
+    num1 + num2
+}
+
+multiply_two_numbers <- function(num1, num2){
+  num1 * num2
+}
+
+some_function <- function(func){
+    func(2, 4)
+}
+
+some_function(add_two_numbers)
+some_function(multiply_two_numbers)
+some_function(paste)
+```
+As you can see we use the argument name "func" like a function inside of "some_function()."  
+ 
+Finish the function definition below so that if a function is passed into the "func" argument and some data (like a vector) is passed into the dat argument the evaluate() function will return the result of dat being passed as an argument to func.  
+```{r}
+evaluate <- function(func, dat){
+  func(dat)
+}
+
+evaluate(sum, c(2, 4, 6))
+evaluate(median, c(7, 40, 9))
+evaluate(floor, 11.1)
+```  
+
+### Ellipses as arguments
+The ellipses can be used to pass on arguments to other functions that are used within the function you're writing. Usually a function that has the ellipses as an argument has the ellipses as the last argument. The usage of such a function would look like: *ellipses_func(arg1, arg2 = TRUE, ...)*  
+In the above example arg1 has no default value, so a value must be provided for arg1. arg2 has a default value, and other arguments can come after arg2 depending on how they're defined in the ellipses_func() documentation. Interestingly the usage for the paste function is as follows:  
+*paste (..., sep = " ", collapse = NULL)*  
+Notice that the ellipses is the first argument, and all other arguments after the ellipses have default values. This is a strict rule in R programming: all arguments after an ellipses must have default values. Take a look at the simon_says function below:  
+```{r}
+simon_says <- function(...){
+   paste("Simon says:", ...)
+}
+simon_says("put your hands on your head!")
+```  
+
+Telegrams used to be peppered with the words START and STOP in order to demarcate the beginning and end of sentences. Write a function below called  telegram that formats sentences for telegrams. For example the expression `telegram("Good", "morning")` should evaluate to:
+*"START Good morning STOP"*  
+```{r}
+telegram <- function(...){
+  paste("START", ..., "STOP")
+}
+telegram("Good", "morning")
+```  
+
+### Unpacking Elipses  
+Let's explore how to "unpack" arguments from an ellipses when you use the ellipses as an argument in a function. Below I have an example function that is supposed to add two explicitly named arguments called alpha and beta.
+```{r}
+add_alpha_and_beta <- function(...){
+   # First we must capture the ellipsis inside of a list
+   # and then assign the list to a variable. Let's name this
+   # variable `args`.
+
+   args <- list(...)
+
+   # We're now going to assume that there are two named arguments within args
+   # with the names `alpha` and `beta.` We can extract named arguments from
+   # the args list by using the name of the argument and double brackets. The
+   # `args` variable is just a regular list after all!
+   
+   alpha <- args[["alpha"]]
+   beta  <- args[["beta"]]
+
+   # Then we return the sum of alpha and beta.
+
+   alpha + beta 
+}
+
+add_alpha_and_beta(alpha = 100, beta = 20)
+```  
+
+Have you ever played Mad Libs before? The function below will construct a sentence from parts of speech that you provide as arguments. We'll write most of the function, but you'll need to unpack the appropriate arguments from the ellipses.
+```{r}
+mad_libs <- function(...){
+  # Do your argument unpacking here!
+  
+  args <- list(...)
+  place <- args["place"]
+  adjective <- args["adjective"]
+  noun <- args["noun"]
+  
+  # Don't modify any code below this comment.
+  # Notice the variables you'll need to create in order for the code below to
+  # be functional!
+  paste("News from", place, "today where", adjective, "students took to the streets in protest of the new", noun, "being installed on campus.")
+}
+mad_libs(place = "Christchurch", adjective = "uncool", noun = "Ski ramp")
+```  
+
+### Creating Binary Operators  
+The syntax for creating new binary operators in R is unlike anything else in R, but it allows you to define a new syntax for your function. I would only recommend making your own binary operator if you plan on using it often!  
+User-defined binary operators have the following syntax:  
+*%[whatever]%*  
+where [whatever] represents any valid variable name.  
+Let's say I wanted to define a binary operator that multiplied two numbers and then added one to the product. An implementation of that operator is below:  
+```{r}
+"%mult_add_one%" <- function(left, right){ # Notice the quotation marks!
+   left * right + 1
+}
+4 %mult_add_one% 5
+```  
+  
+Write your own binary operator below from absolute scratch! Your binary operator must be called %p% so that the expression:  
+"Good" %p% "job!"  
+will evaluate to: "Good job!"  
+```{r}
+"%p%" <- function(left, right){ 
+  paste(left, right)
+}
+"Hello" %p% "world!"
+```  
+
+## Swirl Lesson 14: Dates and Times  
+ - *Sys.Date()* gets a date object with the current date  
+ - *as.Date("1986-09-26")* to create a custom date object  
+ -- use *unclass(Sys.Date())* to see that dates are stored as days since 1970-01-01.  
+ -- dates before 1970 are stored as negative numbers.  
+ - *Sys.time()* is a POSIXct object with the current time.  
+ -- time is stored internally as the number of seconds since 1970-01-01 00:00:00  
+ - *as.POSIXlt(Sys.time())* coerces it into a POSIXlt object  
+ -- it is stored internally as a list, with elements representing seconds, minutes, hours, day of month, month, year, day of week, day of year, daylight savings, time zone, and two more time zone related elements.  
+```{r}
+t1 <- as.POSIXlt("1986-09-26 12:45:00 BRT")
+str(unclass(t1))  ## str() Compactly displays structure of an object.
+t1$min  ## easily extracted elements
+```  
+ - *weekdays()* returns day of the week for any date or time object.  
+ - *months()* returns the month.  
+ - *quarters()* returns the quarter of th year.  
+ -- there functions work on date, POSIXct and POSIXlt objects.  
+```{r}
+t1 <- as.POSIXlt("1986-09-26 12:45:00 BRT")
+weekdays(t1)
+months(t1)
+quarters(t1)
+```  
+ - *strptime()* can extract dates and times from formats not recognised by R.  
+ -- it converts a character vector into POSIXlt.  
+```{r}
+t1 <- "October 17, 1986 08:24"
+strptime(t1, "%B %d, %Y %H:%M")
+```  
+ - arithmetic operations + and -, and comparisons <, > and == can be performed on date and time objects.  
+ - *difftime()* allows for more precise control of units when performing subtractions.  
