@@ -9,3 +9,61 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# R Programming Week 4: Simulation and Profiling  
+Simulating data in R can be useful for simulation studies. The profiler tool lets you collect detailed information about how your functions are running, to identify bottlenecks that need to be addressed. This week also covers the use of the STR function. 
+
+**Learning Objectives**
+ * Call the 'str' function on an object.  
+ * describe the difference beween the 'by.self' and 'by.total' output produced by the R profiler.  
+ * Simulate a random normal variable with an arbitrary mean and standard deviation.  
+ * Simulate data form a normal linear model.  
+ 
+## The 'str' Function  
+It compactly displays the internal structure of a object. It's a simple diagnostic function, similar to 'summary'. It's particularly well suited to displaying the contents of nested lists, and tries to give only one line per basic object.
+```{r}
+str(str)
+str(lm) ## gives arguments of a function
+
+x <- rnorm(100, 2, 4)
+summary(x)
+str(x)  ## gives different information
+
+f <- gl(40, 10)
+str(f)
+summary(f)  ## summary is not as useful in this case.
+
+library(datasets)
+str(airquality)  ## output for a data frame
+
+m <- matrix(rnorm(100), 10, 10)
+str(m)  ## results for a matrix, dimensions and sample of first column
+
+s <- split(airquality, airquality$Month)
+ ## this is a list with 5 data frames, each one a piece of the 
+ ## original, separated by month.
+str(s)  ## gives some detail for each element
+```  
+
+## Simulation - Generating Random Numbers  
+ - `rnorm`: random normal variates, with given mean and standard deviation.   
+  -- `dnorm`: evaluate the Normal probability density, with a given mean and SD, at a point of vector of points.  
+  -- `pnorm`: evaluate the cumulative distribution function for a random normal distribution.  
+  -- `qnorm`: quantile function. 
+ - `rpois`: generate random Poisson variates with a given rate.  
+  -- also includes `d`, `q` and `p` forms. 
+ - The same 4 functions exist for different distributions, too. 
+
+```{r, echo = FALSE}
+str(list(dnorm = dnorm, pnorm = pnorm, qnorm = qnorm, rnorm = rnorm))
+```  
+Mean and sd must be provided, otherwise default values are used.  
+
+ * `dnorm` calculates the density. I.e.: for a value of `x`, the function gives the frequency (vertical axis) of the distribution. Equivalent of applying the normal distribution function  
+ $$\frac{1}{\sigma\sqrt{2\pi}} * e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$ 
+ 
+     * The Log can be calculated instead, but is FALSE by default. 
+     * It's useful to think of `x` in `dnorm` as the z-score, for the standard normal distribution. 
+ * `pnorm` and `qnorm` also can evaluate the Log, but also have an option for the lower tail. This is the left side of the distribution. Setting it to FALSE will determine the upper tail instead. 
+  * `pnorm` returns the area under the curve, from $-\infty$ to `q`. `q` is a z-score. (I.e. the probability that any given value of the population falls between $-\infty$ and `q`.)  
+  * `qnorm` is the opposite of `pnorm`. Given a probability `p`, it returns the z-score for that probability.  
+ 
