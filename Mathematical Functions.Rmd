@@ -34,9 +34,28 @@ gl(3, 10)  ## generates a numeric vector, elements are 1 repeated k times,
 rnorm(10, 5, 2.1)  
   ## generates n random numbers with mean and standard dev, based on a 
   ## normal distribution.
+dnorm(-0.5, 0, 1) 
+  ## calculates the density. I.e.: for a value of `x`, the function gives 
+  ## the frequency (vertical axis) of the distribution. Equivalent of 
+  ## applying the normal distribution function:
+```
+$$\frac{1}{\sigma\sqrt{2\pi}} * e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$ 
+```{r}
+pnorm(-0.5, 0, 1)
+  ## returns the area under the curve, from $-\infty$ to `q`. `q` is a 
+  ## z-score. (I.e. the probability that any given value of the population 
+  ## falls between $-\infty$ and `q`.)
+qnorm(-1.2, 0, 1) 
+  ## is the opposite of `pnorm`. Given a probability `p`, it returns the 
+  ## z-score for that probability. 
+
 runif(10, 3, 13) 
   ## generates n random numbers, with minimum and max set, based on a
-  ## uniform distribution.
+  ## uniform distribution. d, p and r functions also exist for this 
+  ## distribution
+rpois(10, 30)
+  ## generates n random numbers, with rate lambda, based on a poisson
+  ## distribution. d, p and r functions also exist for this distribution.
 
 corr(x, runif(length(x), 0, 10))  ## calculates correlation between to vectors 
 
