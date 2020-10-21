@@ -97,6 +97,90 @@ log.mu <- 0.5 + 0.3 * x
 y <- rpois(100, exp(log.mu))
 summary(y)
 plot(x, y)
+```  
+
+## Simulation - Random Sampling  
+The `sample` function allows us to get random samples from a vector of numbers or characters.
+```{r, echo=FALSE}
+str(sample)
+```
+```{r}
+set.seed(1)
+sample(1:10, 4)
+sample(1:10, 4) ## gives a random sample of 4 elements from the vector
+sample(letters, 5) ## also works with character vectors
+sample(1:10)  ## if no size is specified, it gives a random permutation.
+sample(1:10, replace = TRUE) ## allows an item to be sampled more than once
 ```
 
+# R Profiler  
+Useful tool for very large Data sets, or other work where processing might be taking a very long time. It helps you find out why things are taking so long and suggest strategies for faster solutions. 
+
+## Why is My Code So Slow?  
+ * Profiling is a systematic way to examine how much time is spent on different parts of the program. 
+ * Useful when trying to optimize your code. 
+ * Often code runs fine once, but what if you have to put it in a loop for 1000 iterations? Is it still fast enough? 
+ * Profiling is better than guessing. 
+ 
+**On Optimizin your code**  
+ * Optimization is not the first priority when writing code. It is more important to focus on readability and making sure it works. 
+  -- It's often difficult to understand where exactly your program is spending most of its time, and this cannot be done without performance analysis or profiling.  
+> We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. 
+> --Donald Knuth
+
+**General Principles**  
+ * Design first, then optimize 
+ * Remember premature optimization is the root of all evil 
+ * Measure (collect data), don't guess. 
+ * If you're going to be a scientist, you need to apply the same principles here. 
+
+## Using `system.time()` 
+ * Takes an arbitrary R expression as input (can be wrapped in curly braces) and returns the amount of time taken to evaluate the expression. 
+ * Computes the time (in seconds) needed to execute an expression. 
+  -- If there's an error, it gives the time until the error occured. 
+ * Returns an object of class `proc_time` 
+  -- **user time**: time charged to the CPU for this expression 
+  -- **elapsed time**: "wall clock" time. 
+  -- (usually both times are similar, but may differ if the computer has multiple CPUs and the program can use them, if the CPU spends time waiting for other things to occur, or in other more complex scenarios) 
+```{r}
+## Example Elapsed time > user time
+system.time(readLines("http://www.jhsph.edu"))
+
+## Elapsed time < user time
+hilbert <- function(n) {
+  i <- 1:n
+  1 / outer(i - 1, i, "+")
+}
+x <- hilbert(1000)
+system.time(svd(x))  
+ ## the svd function takes advantage of multiple cores in some computers.
+
+system.time( {
+  n <- 1000
+  r <- numeric(n)
+  for (i in 1:n) {
+    x <- rnorm(n)
+    r[i] <- mean(x)
+  }
+  print(summary(r))
+})  ## example of system.time using curly braces. 
+```
+ * `system.time()` allows you to test cartain functions or code blocks to see if they are taking excessive amounts of time. 
+ * this assumes you already know where the problem is and can call `system.time()` on it. 
+
+## Using `Rprof()`  
+ * The `Rprof()` functions starts the profiler in R. 
+  -- R must be compiled with profiler support, but this is usually the case. 
+ * the `summaryRprof()` function summarizes the output from `Rprof()`. The raw output is unreadable. 
+ * **DO NOT** use `system.time()` and `Rprof()` together. 
+
+ * `Rprof()` keeps track of the function call stack at regularly sampled intervals and tabulates how much time is spent in each function. 
+ * default sampling interval is 0.02 seconds. 
+ * Note: if your code runs very quickly, the profiler is not helpful, but then you probably don't need it anyway. 
+
+### Using `summaryRprof()`  
+ * This function tabulates the R profiler and calculates how much time is spent in which function. 
+ * There are two methods for normalizing the data. 
+ * `by.total` divides the time spent in each function by the total run time. 
+ * `by.self` does the same but first it subtracts out time spent in functions above the call stack. 
 
