@@ -65,5 +65,6 @@ m <- matrix(c(5, 1, 0,
 solve(m) ## calculates the inverse matrix
 m %*% solve(m)  ## mathematical matrix multiplication
 
+## svd()  ## single value decomposition of a matrix
 ```
 
