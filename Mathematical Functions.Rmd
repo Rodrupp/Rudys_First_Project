@@ -20,6 +20,13 @@ sqrt(x) ## square root
 abs(x) ## absolute value
 Inf  ## infinity, also possible in the negative
 NaN  ## Not a number, such as 0/0
+sample(1:6, 4, replace = TRUE) ## simulate rolling 4 dice
+sample(letters, 3)  ## letters is a predefined vector in R
+sample(LETTERS, 4) ## upper case letters
+log(x)  ## natural log
+log10(x) ## log base 10
+log(x, base = 2) ## log base 2
+exp(x) ## e to the power of x
 
 
 
@@ -28,9 +35,10 @@ quantile(x, c(0, 0.25, 0.5, 0.75, 1))  ## quartiles, percentiles, deciles...
 signif(x) ## rounds to significant figures
 
 rep(2, 4)  ## repeats a number, n amount of times
-gl(3, 10)  ## generates a numeric vector, elements are 1 repeated k times,
-                ## then 2 repeated k times, then 3, until the number is equal 
-                ## to n. 
+gl(3, 10) 
+ ## generates a numeric vector, elements are 1 repeated k times,
+ ## then 2 repeated k times, then 3, until the number is equal 
+ ## to n. 
 rnorm(10, 5, 2.1)  
   ## generates n random numbers with mean and standard dev, based on a 
   ## normal distribution.
@@ -51,13 +59,23 @@ qnorm(-1.2, 0, 1)
 
 runif(10, 3, 13) 
   ## generates n random numbers, with minimum and max set, based on a
-  ## uniform distribution. d, p and r functions also exist for this 
+  ## uniform distribution. d, p and q functions also exist for this 
   ## distribution
 rpois(10, 30)
   ## generates n random numbers, with rate lambda, based on a poisson
-  ## distribution. d, p and r functions also exist for this distribution.
+  ## distribution. d, p and q functions also exist for this
+  ## distribution.
+rbinom(5, size = 100, prob = 0.25)
+  ## generates 100 coin tosses with 0.25 probability of success and 
+  ## sums up the successes, the repeats the proces 5 times and 
+  ## outputs a vector or the results. d, p and q functions also exist
+rexp(5)  ## exponential
+rchisq(5, 1)  ## chi-squared
+##rgamma()
 
-corr(x, runif(length(x), 0, 10))  ## calculates correlation between to vectors 
+
+corr(x, runif(length(x), 0, 10))  
+  ## calculates correlation between to vectors 
 
 m <- matrix(c(5, 1, 0,
                 3,-1, 2,
@@ -68,3 +86,12 @@ m %*% solve(m)  ## mathematical matrix multiplication
 ## svd()  ## single value decomposition of a matrix
 ```
 
+
+```{r}
+rep <- replicate(8, rbinom(5, 25, prob = 0.2))
+rep  ## can create a matrix for results
+
+colMeans(rep) ## means of each column
+
+hist(colMeans(rep)) ## generate a histogram
+```  
