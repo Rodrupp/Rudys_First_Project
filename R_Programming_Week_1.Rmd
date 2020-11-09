@@ -289,7 +289,7 @@ tabAll <- read.table("datatable.txt", colClasses = classes)
  - set *nrows* to help reduce memory usage. a mild overestimate is okay.  
  
 It's useful to know a few things:  
- - How much memry is available?  
+ - How much memory is available?  
  - what other applications are in use?  
  - are other users using resources of the computer?  
  - what operating system are you using?  is it 32 or 64 bit?  
@@ -514,6 +514,9 @@ x %*% y  ## true matrix multiplication
 ```
 
 # Week 1 Quiz Questions
+
+## Part 1  
+
 ```{r}
 ## Extract the subset of rows of the data frame where Ozone 
 ## values are above 31 and Temp values are above 90. What is the 
@@ -549,7 +552,8 @@ mean(BigTemp[ , 3])
 
 ```  
 
-**A more elegant solution:**
+### A more elegant solution:  
+
 ```{r}
 ## Extract the subset of rows of the data frame where Ozone 
 ## values are above 31 and Temp values are above 90. What is the 
@@ -576,7 +580,8 @@ mean(ValidRows124[OandTTest, ][ , 3])
       ## taking the mean of the third column of the resulting matrix
 ```  
 
-**Event Better**
+### Even Better:  
+
 ```{r}
 ## Extract the subset of rows of the data frame where Ozone 
 ## values are above 31 and Temp values are above 90. What is the 
@@ -593,7 +598,7 @@ x[!is.na(x$Ozone), ]
 mean(x[!is.na(x$Ozone),"Solar.R"]) ## mean of column "Solar.R"
 ```
 
-
+## Part 2  
 ```{r}
  ## What is the mean of "Temp" when "Month" is equal to 6? 
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
@@ -612,7 +617,7 @@ mean(ValidRows124[June, ][ , 1])
     ## mean of the first column of the matrix with extracted rows only
 ```  
 
-**Better**
+### Better  
 ```{r}
  ## What is the mean of "Temp" when "Month" is equal to 6? 
 quiz <- read.csv(file = "hw1_data.csv")  ##reading file
@@ -623,7 +628,7 @@ quiz[quiz$Month == 6, "Temp"]
 mean(quiz[quiz$Month == 6, "Temp"])
 ```
 
-
+## Part 3  
 
 ```{r}
 ## What was the maximum ozone value in the month of May 
@@ -645,7 +650,8 @@ max(ValidRows124[May, ][ , 1])
 
 ```  
 
-**Better**
+### Better  
+
 ```{r}
 ## What was the maximum ozone value in the month of May 
 ## (i.e. Month is equal to 5)?
@@ -671,9 +677,7 @@ New commands:
 
  - *ls()* displays a list of all variables saved in the workspace  
  - *getwd()* displays the path t the working directory  
- - *sqrt()* square root  
  - pressing the up arrow on the console shows the previous command  
- - *abs()* absolute value  
  - *c()* can be used to merge vectors or lists, eg:
 ```{r}
 x <- c(2, 23, 1)
