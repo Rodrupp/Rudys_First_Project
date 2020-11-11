@@ -534,9 +534,10 @@ length(cr)
 
 # Swirl Exercises Week 2  
 ## Swirl Lesson 8: Logic  
- - Logical operators *==*, *!=*, *>*, *>=*, *<*, *<=*  
- -- *%%* is used to find the remainder.
- - *"!"* in front of a *TRUE* returns a *FALSE* and vice-versa  
+ - Logical operators `==`, `!=`, `>`, `>=`, `<`, `<=`  
+ -- `%%` is used to find the remainder.
+ - `!` in front of a *TRUE* returns a *FALSE* and vice-versa  
+ - `%in%` checks if the value is present in the vector
 ```{r}
 15 %% 7
 TRUE == TRUE
@@ -545,12 +546,14 @@ TRUE == TRUE
 ! 5 == 7
 !(0 >= -1)
 (TRUE != FALSE) == !(6 == 7)
+5 %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
+"pizza" %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
 ```  
- - *"&"* and *"&&"* return TRUE only if both parts are TRUE  
- -- *"&"* evaluates each element in a vector (recycling may happen).  
- -- *"&&"* evaluates only the first element of vectors.  
- - *"|"* and *"||"* return TRUE if either parts are TRUE  
- -- same differences as for *"&"* and *"&&"*  
+ - `&`* and `&&` return TRUE only if both parts are TRUE  
+ -- `&` evaluates each element in a vector (recycling may happen).  
+ -- `&&` evaluates only the first element of vectors.  
+ - `|` and `||` return TRUE if either parts are TRUE  
+ -- same differences as for `&` and `&&`  
  - All **AND** operators are evaluated before **OR** operators.  
 ```{r}
 TRUE & TRUE
@@ -561,11 +564,11 @@ TRUE && c(TRUE, FALSE, FALSE)
 6 != 10 && FALSE && 1 >= 2
 5 > 8 || 6 != 8 && 4 > 3.9
 ```  
- - *isTRUE()* returns TRUE only if the argument inside is *TRUE*, otherwise it returns *FALSE*.  
- - *identical()* returns TRUE is both arguments are identical.  
- - *xor()* is the exclusive **OR**. It returns TRUE if only one element is TRUE.  
- - *which()* takes a logical vector as argument and returns the indeces of TRUE elements.  
- - *any()* and *all()* return TRUE if any or all elements of a logical vector are TRUE, respectively.  
+ - `isTRUE()` returns TRUE only if the argument inside is *TRUE*, otherwise it returns *FALSE*.  
+ - `identical()` returns TRUE is both arguments are identical.  
+ - `xor()` is the exclusive **OR**. It returns TRUE if only one element is TRUE.  
+ - `which()` takes a logical vector as argument and returns the indeces of TRUE elements.  
+ - `any()` and `all()` return TRUE if any or all elements of a logical vector are TRUE, respectively.  
 ```{r}
 isTRUE("egg salad")
 isTRUE(5 != 4)
