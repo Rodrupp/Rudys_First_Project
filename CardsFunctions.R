@@ -6,64 +6,42 @@ diamonds <- paste(cards, rep("of Diamonds", 13))
 deck <- c(spades, hearts, clubs, diamonds, "Joker", "Joker")
 decknj <- c(spades, hearts, clubs, diamonds)
 
-reset <- function() {
-        player1 <<- character(length = 0)
-        player2 <<- character(length = 0)
-        player3 <<- character(length = 0)
-        player4 <<- character(length = 0)
-        player5 <<- character(length = 0)
-        player6 <<- character(length = 0)
+setup <- function(n = 2, names = NULL) {
+        if(!(length(names) == n | is.null(names))) {
+                stop("number of names must equal number of players.")
+        }
+        if(is.null(names)) {
+                names <- character()
+                for(i in 1:n) {
+                        x <- paste("player", i, sep = "")
+                        names[i] <- x
+                }
+        }
+        hand <<- list()
+        for (i in 1:n) {
+                hand[i] <<- as.character(NA)
+        }
+        names(hand) <<- names
+        
         drawpile <<- deck
 }
+
 
 shuffle <- function() {
         drawpile <<- sample(drawpile)
 }
 
-p1pickup <- function(n = 1) {
+pickup <- function(player, n = 1) {
         for (i in 1:n) {
-        player1 <<- c(player1, drawpile[length(drawpile)])
-        length(drawpile) <<- length(drawpile) - 1
-        }
-}
-
-p2pickup <- function(n = 1) {
-        for (i in 1:n) {
-                player2 <<- c(player2, drawpile[length(drawpile)])
+                x <- c(hand[[player]], drawpile[length(drawpile)])
+                hand[[player]] <<- x[!is.na(x)]
                 length(drawpile) <<- length(drawpile) - 1
         }
 }
 
-p3pickup <- function(n = 1) {
-        for (i in 1:n) {
-                player3 <<- c(player3, drawpile[length(drawpile)])
-                length(drawpile) <<- length(drawpile) - 1
-        }
-}
 
-p4pickup <- function(n = 1) {
-        for (i in 1:n) {
-                player4 <<- c(player4, drawpile[length(drawpile)])
-                length(drawpile) <<- length(drawpile) - 1
-        }
-}
-
-p5pickup <- function(n = 1) {
-        for (i in 1:n) {
-                player5 <<- c(player5, drawpile[length(drawpile)])
-                length(drawpile) <<- length(drawpile) - 1
-        }
-}
-
-p6pickup <- function(n = 1) {
-        for (i in 1:n) {
-                player1 <<- c(player6, drawpile[length(drawpile)])
-                length(drawpile) <<- length(drawpile) - 1
-        }
-}
-
-deal <- function(n = 7, p = 2, NoJoker = FALSE, TwoDecks = FALSE, shuffle = TRUE) {
-        if(p > 6) return("Maximum Number of players is 6")
+deal <- function(n = 7, p = length(hand), NoJoker = FALSE, TwoDecks = FALSE, 
+                 shuffle = TRUE) {
         if(NoJoker == TRUE) {
                 deck <- deck[1:52]
         }
@@ -71,19 +49,21 @@ deal <- function(n = 7, p = 2, NoJoker = FALSE, TwoDecks = FALSE, shuffle = TRUE
                 deck <- c(deck, deck)
         }
         if (shuffle == TRUE) {
-                drawpile <- sample(deck)
+                drawpile <<- sample(deck)
         }
-        for (i in 1:n) {
-                p1pickup()
-                if(p > 1) p2pickup()
-                if(p > 2) p3pickup()
-                if(p > 3) p4pickup()
-                if(p > 4) p5pickup()
-                if(p > 5) p6pickup()
+        drawpile <<- drawpile
+        
+        for (j in 1:n) {
+               for (i in 1:p) {
+                        pickup(names(hand)[i], 1)
+                }
         }
 }
 
 reveal <- function(n) {
-        pile[length(pile):(length(pile)-(x-1))]
+        drawpile[length(drawpile):(length(drawpile)-(n-1))]
 }
 
+## discard
+## discard pile
+## table list
