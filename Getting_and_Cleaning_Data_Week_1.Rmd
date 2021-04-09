@@ -117,7 +117,7 @@ You might use R to download files, so that the downloading process is included i
  - `file.exists("directoryName")`  
  - `dir.create("directoryName")`  
 ```{r}
-setwd("C:/Users/RudyR/Desktop/Data Science Course/Rudys_First_Project")
+setwd("C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project")
 if(!file.exists("data")) {
     dir.create("data")
 }  ## creates a folder called data, if it doesn't already exist.
