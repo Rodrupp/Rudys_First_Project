@@ -128,7 +128,7 @@ while(z >= 3 && z <= 10) {
 Conditions are evaluated left to right.  
 
 ### "Repeat" Loops, "Next" and "Break"  
-Repeat is not frequently used because it continues to run forever, or until *break* is called within it (typically inside an if function). 
+Repeat is not frequently used because it continues to run forever, or until *break* is called within it (typically inside an `if` function). 
 ```{r}
 x0 <- 10000
 tol <- 1
@@ -207,10 +207,10 @@ sd(x = mydata)
 sd(x = mydata, na.rm = FALSE)
 sd(na.rm = FALSE, x = mydata)
 sd(na.rm = FALSE, mydata)
-   ## in th last example, the order is changed. it might work but
+   ## in the last example, the order is changed. it might work but
    ## is not recommended.
 ```  
-Positional matching and matching by name can be mixed, which is useful for long list of arguments. E.g.:  
+Positional matching and matching by name can be mixed, which is useful for long lists of arguments. E.g.:  
 ```{r}
 mydata <- data.frame(x = 1:50, y = sequence(50, from = 27, by = 2))
 
@@ -296,7 +296,7 @@ Note that R has separate namespaces for functions and non-functions. So it is po
  - Determine how a value is associated with a free variable in a function  
  - *lexical* aka *static* scoping. (an alternative is *dynamic* scoping)  
  - R uses the *search* list to bind a value to a symbol  
- - *lexical scoping* is particularly useful for sumplifying statistical computations.  
+ - *lexical scoping* is particularly useful for simplifying statistical computations.  
 ```{r}
 f <- function(x, y) {
             x^2 + y / z
