@@ -28,11 +28,15 @@ log10(x) ## log base 10
 log(x, base = 2) ## log base 2
 exp(x) ## e to the power of x
 
-
+seq_len(8)  ## creates a sequence
+seq_along(x)  ## numeric vector with sequence equal to length(x)
+      ## identical to seq_len(length(x))
 
 quantile(x, c(0, 0.25, 0.5, 0.75, 1))  ## quartiles, percentiles, deciles...
 
 signif(x) ## rounds to significant figures
+
+sample(x, size = 1) ## takes a sample of SIZE from elements of x
 
 rep(2, 4)  ## repeats a number, n amount of times
 gl(3, 10) 
