@@ -280,7 +280,7 @@ Things to do to facilitate reading.
  - Read the Help page carefully for read.table
  - Make a rough calculation of the memory required to store your dataset. Is it larger than the RAM on your computer? If so don't proceed.  
  - Set *comment.char = " "* if there are no commented lines in your file.  
- - use the colClasses argument. Specifying this option instead of using the default. R won't need to try to figure it out. If all classes are the same class you can set them all with *colClasses = "numeric"* for example. Alternatively, use the first 100 rows and let read.table find the classes, then apply them to reading the whole text:  
+ - use the *colClasses* argument. Specifying this option instead of using the default. R won't need to try to figure it out. If all classes are the same class you can set them all with *colClasses = "numeric"* for example. Alternatively, use the first 100 rows and let read.table find the classes, then apply them to reading the whole text:  
 ```{r}
 initial <- read.table("datatable.txt", nrows = 100)
 classes <- sapply(initial, class)  ## S apply calls the class of each column
@@ -398,7 +398,7 @@ x <- list(foo = 1:4, bar = 0.6, baz = "hello")
 x
 x[1]  ## extract 1st element, same class as original (a list)
 class(x[1])
-x[[1]] ## extract 1st element as just a sequence
+x[[1]] ## extract 1st element as its own object class
 class(x[[1]])
 x$bar ## gives element associated with name "bar"
 x[["bar"]] ## same as above
@@ -463,14 +463,15 @@ x[["a", exact = FALSE]]  ## default behaviour can be turned off
 ### Removing NA values
 A common task  
 ```{r}
-x <- c(1, 2, NA, 4, NA, 5)  ## an object that requires cleaning
+x <- c(1, 2, NA, 4, NA, 6)  ## an object that requires cleaning
 bad <- is.na(x)  ## logical vector testing for NA
 bad
 x[!bad]  ## "!" used to invert the logical vector. 
          ## The logical vector determines which elements to return.
+x[!is.na(x)]  ## common usage
 ```  
 
-You can take the subset of different object that have no missing values:  
+You can take the subset of different objects that have no missing values:  
 ```{r}
 x <- c(1, 2, NA, 4, NA, 6, 7, 8, NA, 10, 11)
 y <- c("a", "b", NA, "d", NA, "f", "g", "h", "i", NA, "k")
