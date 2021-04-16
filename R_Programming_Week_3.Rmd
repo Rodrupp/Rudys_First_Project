@@ -62,14 +62,14 @@ sapply(x, mean)  ##returns a vector instead of a list
 mean(x) ## doesn't work because mean doesn't apply to lists. 
 
 x <- list(a = 1:5, b = rnorm(10), c = rnorm(5, 10), d = c("a", "b", "c"))
-y <- sapply(x, mean)  ## calculates means where possible and returns NA
-y                     ## otherwise
+y <- sapply(x, mean)  
+y   ## calculates means where possible and returns NA otherwise
 
 class(y)
 ```  
 
 ## Loop functions - *apply*  
-Used to evaluate a function over the margins of an array (matrices or 3d arrays). It used to be faster than using a a for loop, but that's no longer the case. It just requires less typing.  
+Used to evaluate a function over the margins of an array (matrices or 3d arrays). It used to be faster than using a for loop, but that's no longer the case. It just requires less typing.  
 ```{r}
 args(apply)
 ```  
@@ -114,6 +114,18 @@ apply(a, c(1, 2), mean)
 
 ## can also be achieved by:
 rowMeans(a, dims = 2)
+
+## another example with an array
+y <- array(1:60, dim = c(3,4,5), dimnames = list("Height" = c("short", "mid", "tall"),"Weight" = c("light","medium", "heavy", "huge"), "Time" = c("very slow", "slow", "average", "fast", "very fast") ))
+y
+apply(y, c("Time", "Weight"), mean)  ## choose two dimensions to return a matrix
+
+## playing with a function that builds arrays
+source("makecubearray.R")
+makecubearray(3,3, func = sum)
+z <- makecubearray(4,4, func = paste,collapse = "")
+z <- array(as.numeric(z), dim = c(4,4,4,4))
+apply(z, 1, str)
 ```
 
 ## Loop functions - *mapply*  
@@ -195,7 +207,7 @@ lapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
 ## includes NAs
 ```  
 
-I can then also use *sapply* to give the results a a matrix instead:  
+I can then also use *sapply* to give the results as a matrix instead:  
 ```{r}
 sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
 
