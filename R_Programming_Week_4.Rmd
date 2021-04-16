@@ -17,7 +17,7 @@ Simulating data in R can be useful for simulation studies. The profiler tool let
  * Call the 'str' function on an object.  
  * describe the difference beween the 'by.self' and 'by.total' output produced by the R profiler.  
  * Simulate a random normal variable with an arbitrary mean and standard deviation.  
- * Simulate data form a normal linear model.  
+ * Simulate data from a normal linear model.  
  
 ## The 'str' Function  
 It compactly displays the internal structure of a object. It's a simple diagnostic function, similar to 'summary'. It's particularly well suited to displaying the contents of nested lists, and tries to give only one line per basic object.
