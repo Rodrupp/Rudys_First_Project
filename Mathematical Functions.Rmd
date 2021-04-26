@@ -29,6 +29,8 @@ log10(x) ## log base 10
 log(x, base = 2) ## log base 2
 exp(x) ## e to the power of x
 
+table(x)  ## creates a table that counts repeated elements
+
 seq_len(8)  ## creates a sequence
 seq_along(x)  ## numeric vector with sequence equal to length(x)
       ## identical to seq_len(length(x))
@@ -79,7 +81,7 @@ rchisq(5, 1)  ## chi-squared
 ##rgamma()
 
 
-corr(x, runif(length(x), 0, 10))  
+cor(x, runif(length(x), 0, 10))  
   ## calculates correlation between to vectors 
 
 m <- matrix(c(5, 1, 0,
