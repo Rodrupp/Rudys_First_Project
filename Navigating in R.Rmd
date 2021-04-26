@@ -1,0 +1,40 @@
+---
+title: "Navigating in R"
+author: "Rudy"
+date: "21/04/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Navigating folders, creating and editing files
+
+```{r}
+getwd() ## returns current working directory
+x <- getwd()
+setwd(x) ## sets the current working directory.
+        ## Relative versus absolute paths:  
+        ## relative `setwd("../")`  
+        ## absolute `setwd("C:/Users/RudyR/OneDrive/Desktop")`  
+        ## in Windows: `setwd(C:\\users\\RudyR\\Desktop)` 
+
+        ## test whether a file path exists, returns TRUE or FALSE
+if(!file.exists("data")) {
+    dir.create("data")  ## to create a folder
+}
+
+str(download.file)  ## downloads a file from an URL
+                ## method `curl` needs to be specified for https websites when 
+                ## downloading on a Mac. Not needed on windows.
+
+file <- "C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/HouseholdExpenditure2019.csv"
+
+        ## Read data in a flat file format
+ExpenditureData <- read.table(file, sep = ",", header = TRUE)
+        ## another option, `read.csv()` defaults sep = "," header = TRUE
+head(ExpenditureData) ## reads the first few lines of an object
+
+```
+
