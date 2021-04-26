@@ -1,0 +1,441 @@
+---
+title: "Getting and Cleaning Data Week 1"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Course Description
+Before you can work with data you have to get some. This course will cover the basic ways that data can be obtained. The course will cover obtaining data from the web, from APIs, and from colleagues in various formats including raw text files, binary files, and databases. It will also cover the basics of data cleaning and how to make data tidy. Tidy data dramatically speed downstream data analysis tasks. The course will also cover the components of a complete data set including raw data, processing instructions, codebooks, and processed data. The course will cover the basics needed for collecting, cleaning, and sharing data.
+
+ - Data Collection  
+  -- Raw files (.csv, .xlsx)  
+  -- Databases (mySQL)  
+  -- APIs  
+ - Data Formats  
+  -- Flat files (.csv, .txt)  
+  -- XML  
+  -- JSON  
+ - Making Data Tidy  
+ - Distributing data  
+ - Scripting for data cleaning  
+ 
+# Obtaining Data Motivation  
+ - Basic ideas behind getting data ready for analysis  
+  -- Finding and extracting raw data  
+  -- tidy data principles and how to make data tidy  
+  -- Practical implementation through a range of R packages  
+ - Prerequisite courses:  
+  -- The Data Scientist's Toolbox  
+  -- R Programming  
+ - Other useful courses:  
+  -- Exploratory Analysis  
+  -- Reporting Data and Reproducible Research  
+
+ **Goal of this course:**  
+ Focus on the first three stages:  
+ **raw data** -> **Processing script** -> **tidy data** -> data analysis -> data communication  
+ 
+# Raw and Processed Data  
+ *Raw data* can be different, according to who you're speaking to.  
+ "Data are values of qualitative or quantitative variables, belonging to a set of items."  
+
+ **Raw Data**  
+ 
+ - Original source of the data  
+ - Often hard to use for data analyses  
+ - Data analysis *includes* processing  
+ - Raw data may only need to be processed once  
+ 
+ **Processed Data**  
+ 
+ - Data that is ready for analysis  
+ - Processing can include merging, subsetting, transforming, etc.  
+ - There may be standards for processing, depending on the field your work in.  
+ - **All steps should be recorded.**  
+
+# Components of tidy data  
+Four things you should have when you finished going from the raw data to a tidy data set:  
+
+ - the raw data.  
+ - a tidy data set  
+ - a code book describing each variable and its values in the tidy data set (often called metadata)  
+ - an explicit and exact recipe you used to go from 1 to 2 and 3. (in this case it will be recorded as an R script)  
+
+## The Raw Data should be the rawest form of the data that you had access to.  
+ - You ran no software on the data.  
+ - You did not manipulate any numbers in the data set  
+ - you did not remove any data from the data set
+ - you did not summarise the data set in any way
+
+## The tidy data is your objective  
+ - each variable you measure is in one column  
+ - each observation should be in a different row  
+ - there should be one table for each "kind" of variable (eg: data from twitter, fb, etc, one table for each)  
+ - if there are multiple tables, they should include a column in the table that allows them to be linked together.  
+
+ *include variable names if possible, and make them human-readable.*
+ *in general, data should be saved in one file per table*
+ 
+## The code book  
+ - Information about the variables in the data set, not contained in the tidy data.  
+ - Information about the summary choices made. (eg. mean or median)  
+ - Information about the experimental study design used.  
+ 
+ *often written in Word or text file, or Rmarkdown*  
+ *include a section called "Study design" that has a thorough description of how you collected the data*  
+ *include a section called "code book" that describes all variables and units*  
+
+**Instruction list**  
+
+ - ideally a computer script (in R or python)  
+ - the input for the script is the raw data  
+ - the output is the processed, tidy data  
+ - there are no parameters to the script -> exact recipe  
+ *Needs to be reproducible*
+
+In some cases, it will not be possible to script every step. In that case you should provide instructions like:  
+
+ - Step 1: take the raw file, run version 3.1.2 of *summarize software* with parameters a=1, b=2, c=3  
+ - step 2: run software separately for each sample  
+ - setp 3 - take column three of outputfile.out for each sample and that is the corresponding row in the output data set.  
+*very detailed instructions.* **REPRODUCIBILITY**  
+
+# Downloading files with R  
+You might use R to download files, so that the downloading process is included in the processing script.  
+
+ - A basic component of working with data is knowing your working directory.  
+ - the two main commands are `getwd()` and `setwd()`.  
+ - Be aware of the relative versus absolute paths:  
+  -- **relative** `setwd("../")`  
+  -- **absolute** `setwd("C:/Users/RudyR/OneDrive/Desktop")`  
+ - Important difference in Windows: `setwd(C:\\users\\RudyR\\Desktop)`  
+ 
+## Checking for and creating directories  
+ - `file.exists("directoryName")`  
+ - `dir.create("directoryName")`  
+```{r}
+setwd("C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project")
+if(!file.exists("data")) {
+    dir.create("data")
+}  ## creates a folder called data, if it doesn't already exist.
+```  
+
+## Getting data from the internet  
+ - `download.file()` command.  
+ - Even if you could do this by hand, using the command helps with the reproducibility.  
+ - important parameters are `url`, `destfile` and `method`.  
+ - useful for downloading tab-delimited, csv and other files.  
+
+```{r error=TRUE}
+fileURL <- "https://www.stats.govt.nz/assets/Uploads/Household-expenditure-statistics/Household-expenditure-statistics-Year-ended-June-2019/Download-data/detailed-household-expenditure-year-ended-June-2019-csv.csv"
+destinationfile <- "C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/HouseholdExpenditure2019.csv"
+## download.file(fileURL, destfile = destinationfile)
+list.files("C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/")
+dateDownloaded <- date()
+dateDownloaded
+```  
+ - method `curl` needs to be specified for https websites when downloading on a Mac. Not needed on windows.  
+ - it's important to keep track of the date in which it was downloaded, as the file online could be updated.  
+ 
+ **Notes**  
+ 
+ - if the url starts with *http*, you can use download.file()  
+ - if it starts with *https*, on windows you may be ok.  
+ - if it starts with *https*, on Mac you need to set `method = "curl"`  
+ - if the file is big, this might take a while. You may set it up so the file doesn't re-download every time you run the code.  
+ - be sure to record the date when you downloaded it.  
+ 
+# Reading local files  
+ - repeat of content covered in R programming course  
+```{r}
+str(read.table)
+```  
+ - `read.table()` is the main function, but requires a lot of parameters.  
+ - there are faster methods  
+ - reads the data into RAM, can cause problems for large sets.  
+ - related to `read.csv()` and `read.csv2()`  
+ 
+```{r}
+destinationfile <- "C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/HouseholdExpenditure2019.csv"
+ExpenditureData <- read.table(destinationfile, sep = ",", header = TRUE)
+head(ExpenditureData)
+```  
+ - `read.csv()` has defaults `sep = ","` and `header = TRUE`.  
+ - other parameters:  
+  -- `quote` to tell R about quoted values. `quote=""` means no quotes.  
+  -- `na.strings` sets the character that represents a missing value.  
+  -- `nrows` how many rows to read the file.  
+  -- `skip` how many lines to skip before starting to read.  
+
+Quotation marks ' or " in data values can cause trouble for reading the data. Setting `quote=""` often resolves this.  
+
+# Reading Excel Files  
+Use packages to read excel files, such as *xlsx* (requires java), or *readxl* package. 
+```{r}
+library(readxl)
+str(read_xlsx)  ## many optional arguments
+cameras <- read_xlsx("../data/cameras.xlsx")
+head(cameras)
+
+ ## other 
+ ## write.xlsx function available in xlsx package
+ ## 
+ ## XLConnect package has even more options for writing and manipulating
+```  
+ - *xlsx* package include options to read only specific columns. *readxl* can only select by rows.  
+ - `write.xlsx` function available in *xlsx* package  
+ - `read.xlsx2` is faster in large files.  
+ - *XLConnect* package has even more options for writing and manipulating Excel files. Read the vignette if starting to use that package.  
+ - in general it is advised to store your data in either a database, or in `.csv` or tab separated files `.tab` or `.txt`, as they are easier to distribute.  
+ 
+# Reading XML  
+ - *Extensible markup language*  
+ - used to store stuctured data  
+ - particularly used in internet applications  
+  -- Markup: labels that give the text structure  
+  -- Content: the actual text of the document  
+
+  **Tags, elements and attributes**  
+  Tags are general labels. E.g.: `<section>` and `</section>` to start and end a section, or `<line-break />` is an empty tag.  
+  Elements are specific examples of tags. E.g.: `<Greeting>` *Hello* `</Greeting>`  
+  Attributes are components of the label. E.g.: `<img src="jeff.jpg" alt="instructor" />  
+  Very similar to html  
+
+  *Using the XML package*
+```{r}
+library(XML)
+fileURL <- "http://www.w3schools.com/xml/simple.xml"
+## download.file(fileURL, destfile = "../data/simple.xml")
+doc <- xmlTreeParse("../data/simple.xml", useInternalNodes = TRUE) 
+    ## loads the document into RAM in a way R can access it. Still a 
+    ## structured object, though.
+
+rootNode <- xmlRoot(doc)  ## accesses that particular element
+xmlName(rootNode)  ## accesses the name
+
+names(rootNode) ## accesses all names in the structure
+
+rootNode[[1]]  ## access elements of the structured object, as if it's a list.
+
+rootNode[[1]][[1]]  ## first subcomponent of the first subcomponent.
+
+xmlSApply(rootNode, xmlValue) 
+    ## similar to sapply, loops through the parseXML document and applies the
+    ## function xmlValue. Returns all the values separated only at the top level 
+    ## node: "food".
+```  
+
+  *Using the `XPath`, included in XML package*  
+Requires a whole new language, as well as learning XML, but a superficial understanding can already yield good results.  
+More information on [this link](http://www.stat.berkeley.edu/~statcur/Workshop2/Presentations/XML.pdf).  
+ - `/node` Top level node  
+ - `//node` node at any level  
+ - `node[@attr-name]` Node with an attribute name  
+ - `node[@attr-name='bob']` Node with attribute name attrname='bob'  
+
+```{r}
+## applies xmlValue to the nodes called "name"
+xpathSApply(rootNode, "//name", xmlValue) 
+
+ ## turning it into a matrix
+y <- xpathApply(rootNode, 
+                c("//name","//price","//description","//calories"), 
+                xmlValue)
+matrix(y,nrow = 4, ncol = 5)
+```  
+
+## Reading an HTML file  
+```{r}
+fileUrl <- "https://www.espn.com/nfl/team/schedule/_/name/bal/year/2016"
+## download.file(fileUrl, destfile = "../data/ravens.html")
+doc <- htmlTreeParse("../data/ravens.html", useInternal=TRUE)
+scores <- xpathSApply(doc, "//span[@class='ml4']", xmlValue)
+scores
+
+## getting the team names is harder as the <span> tag doesn't have any 
+## attributes to call it from. But you can select a more generic tag and build 
+## a matrix, then subsetting.
+a <-  xpathSApply(doc, "//a[@class='AnchorLink']", xmlValue)
+a ## all "a" tags with class = "AnchorLink", gives us the main table of results
+matx <- matrix(a[1:108], nrow = 18, ncol = 6, byrow = TRUE)
+colnames(matx) <- c("", "Opponents", "Result", "HI PASS", "HI RUSH", "HI REC")
+matx ## Column 1 is empty
+matx[ ,2] ## Opponent names
+```  
+
+Read also the XML package tutorials, in the *Reading XML guides* folder.
+
+# Reading JSON files  
+ - **Javascript Object Notation**  
+ - Lightweight way of storing data  
+ - commonly format for data from application programming interfaces.  
+ - Similar to XML structure, but different sintax.  
+ - Data is stored as :  
+  -- Numbers (double)  
+  -- Strings (double quoted)  
+  -- Boolean  
+  -- array (comma separated enclosed in quare brackets)  
+  -- object (unordered, comma separated collection of key:value pairs in curly brackets)  
+
+best place to start is wikipedia.  
+
+Use the jsonlite package  
+```{r}
+library(jsonlite)
+jsonData <- fromJSON("https://api.github.com/users/jtleek/repos")
+ ## object is a structured data frame. 
+names(jsonData) ## top level variables
+names(jsonData$owner) ## within the element "owner" was stored another data 
+                      ## frame with these top level names
+```  
+
+## Writing JSON files  
+```{r}
+## Using the Iris dataset as an example
+myjson <- toJSON(iris, pretty = TRUE) 
+## pretty = TRUE gives it readable indentation.
+class(myjson)
+iris2 <- fromJSON(myjson) ## getting it back as a data frame
+head(iris2)
+head(iris)  ## data frame is identical to the original one
+```  
+[This link](http://www.r-bloggers.com/new-package-jsonlite-a-smarter-json-encoderdecoder) contains a good tutorial on jsonlight. Also, check the jsonlite vignette and www.json.org for further resources.  
+
+# The data.table Package  
+Often faster and more memory efficient than data frames. All functions that accept data.frame work on data.table. Faster at subsetting, group and updating variables. Updated often.  
+Requires its own syntax.  
+```{r}
+library(data.table)
+## can be used in the same way as data.frame
+DF <- data.frame(x=round(rnorm(9),3),
+                 y=rep(c("a","b","c"),each=3),
+                 z=round(rnorm(9),3))
+head(DF,3)
+DT <- data.table(x=round(rnorm(9),3),
+                 y=rep(c("a","b","c"),each=3),
+                 z=round(rnorm(9),3))
+head(DT,3)
+
+tables() ## allows you to check all data tables in the memory
+```  
+
+## Subsetting a data table  
+```{r}
+## similar to data.frame
+DT[2,] ## subset rows by index
+DT[DT$y=="b",] ## subset rows by logical vector
+
+## different:
+## when using only one index, it subsets based on rows instead of columns
+DT[c(2,3)]
+DF[c(2,3)]
+```  
+
+**Subsetting columns is different:**  
+ - the argument you pass after the comma is called an "expression".  
+ - In R an expression is a collection of statements enclosed in curly brackets.  
+ - example:
+```{r}
+{
+  x <- 1
+  y <- 2
+} ## one expression
+k <- {print(10);5} ## print is 10 but value is 5
+print(k)
+
+## So for example, instead of putting an index in the subsetting, you can pass 
+## a list of functions you want to perform.
+DT[,list(mean(x),sum(z))]
+DT[,table(y)]
+```  
+ 
+## Adding new columns  
+```{r}
+DT[, w:=round(z^2,3)] ## use := to add the variable w to the data frame.
+## Doing this with data frame can be very memory consuming, but it's not a 
+## problem in data.table
+## 
+## But be careful if making a copy of the data table, as changes to the 
+## original will change the copies, too.
+DT2 <- DT
+DT[ , y:= 2]
+head(DT2,3) ## DT2 is changed with it.
+
+## overcome this by using the copy() function
+DT3 <- copy(DT)
+DT[ , y:= 4] ## change y to 4
+head(DT3,3) ## not changed
+```
+
+### Multiple step functions to create new variables  
+ - each statement in an expression is followed by a ";".  
+```{r}
+DT[ ,m:= {tmp <- (x+z); tmp2 <- log2(tmp+5); round(tmp2,2)}]
+## assign temporary variable tmp, then use it.
+head(DT, 3)
+```  
+
+### "plyr" like operations  
+ - plyr is an R package that makes it simple to split data apart, do stuff to it, and mash it back together.  
+```{r}
+DT[ ,a:=x>0] ## column a is logical
+head(DT,3)
+DT[, b:= mean(x+w),by=a] ## mean of rows where a == True is separated from 
+                         ## mean of rows where a == False
+head(DT,3) ## this is pretty cool!
+```  
+
+### Special variables in data.table  
+ - `.N` An integer, length 1, containing the number of rows  
+  -- contains the number of times that a specific group appears  
+```{r}
+set.seed(123)
+DT2 <- data.table(x=sample(letters[1:3], 1E5, replace = TRUE))
+DT2[ , .N, by=x] ## count number of times / rows by x variable
+## calculates it faster than table(DT2$x)
+```  
+ 
+### Keys  
+Setting a key allows you to sort and subsett the data table much faster than you'd be able to on a data frame.  
+```{r}
+DT2 <- data.table(x=rep(letters[1:3],each=100), y=round(rnorm(300),3))
+setkey(DT2,x) ## column x is set as the key
+head(DT2['a'],6) ## subsetting automatically knows to search for the key
+```  
+
+### Joining data tables  
+ - Use keys to facilitate joins  
+```{r}
+DT1 <- data.table(x=c("a","a","b","dt1"), y=1:4)
+DT2 <- data.table(x=c("a","b","dt2"), z=5:7)
+DT1
+DT2
+
+setkey(DT1, x); setkey(DT2, x)
+merge(DT1, DT2)  ## merge function uses the keys to organise the rows. Rows 
+##unique to each data table are excluded.
+## much faster than merging with data frame.
+```  
+
+### Faster reading from file  
+ - `fread` function is provided by the data.table package.  
+ - stands for "fast read"  
+ - substitute for `read.table`
+```{r}
+big_df <- data.frame(x=round(rnorm(1E6),3),y=round(rnorm(1E6),3))
+head(big_df, 3)
+
+file <- tempfile()  ## location of a new temporary file in temp files folder.
+write.table(big_df, file=file, row.names = FALSE, col.names = TRUE, 
+            sep = "\t", quote = FALSE) ## writes the data frame in the temp file
+system.time(fread(file))  ## time required to read the file
+system.time(read.table(file, header=TRUE, sep="\t"))
+```  
+
+New functionalities are frequently being added to the data.table package.  
+ - The latest version can be found [here](https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS?view=markup&root=datatable)  
+ - [Here](http://stackoverflow.com/questions/13618488/what-you-can-do-with-data-frame-that-you-cant-in-data-table) is a list of differences between `data.table` and `data.frame`  
+ - Credit to [Raphael Gottardo and Kevin Ushey](https://github.com/raphg/Biostat-578/blob/master/Advanced_data_manipulation.Rpres)
