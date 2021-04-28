@@ -1,0 +1,23 @@
+---
+title: "Swirl"
+author: "Rudy"
+date: "27/04/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Swirl commands  
+ - `library(swirl)` to load the package.  
+ - `install_from_swirl("course name")` to download a course.  
+ - `swirl()` to start swirl.  
+
+## When you are at the R prompt (>):  
+ - Typing `skip()` allows you to skip the current question.  
+ - Typing `play()` lets you experiment with R on your own; swirl will ignore what you do...  
+  -- UNTIL you type `nxt()` which will regain swirl's attention.  
+ - Typing `bye()` causes swirl to exit. Your progress will be saved.  
+ - Typing `main()` returns you to swirl's main menu.  
+ - Typing `info()` displays these options again.  
