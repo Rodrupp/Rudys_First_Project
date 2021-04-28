@@ -7,6 +7,8 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+See `?Comparisson` for help file on comparisson operators.  
+
 ```{r}
 x <- c(1, 2, 2, 3, 3, 4, 5, 6, 7, 7, 8, 9, 10, 10)
 sum(x)
