@@ -1,0 +1,135 @@
+---
+title: "dplyr"
+author: "Rudy"
+date: "27/04/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# `dplyr` package commands
+
+When using `tbl_df()` for the first time, the following message will appear:  
+```{}
+Error message from swirl `tbl_df()` was deprecated in dplyr 1.0.0.
+Please use `tibble::as_tibble()` instead.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_warnings()` to see where this warning was generated.
+```
+To avoid this, use `tibble()` instead.
+
+
+## Manipulating Data with `dplyr` package  
+```{r dplyr setup, include=FALSE}
+## library(dplyr)
+set.seed(17)
+x <- 50
+datfra <- data.frame(Name = paste(sample(LETTERS, x, replace = TRUE),
+                                   sample(letters, x, replace = TRUE),
+                                   sample(letters, x, replace = TRUE),
+                                   sample(letters, x, replace = TRUE), 
+                                   sep = ""), 
+                     Height = round(rnorm(x, mean = 1.6, sd = 0.2),2), 
+                     Time = round(rnorm(x, mean = 30, sd = 8),1), 
+                     Confidence = round(runif(x,0,10),0),
+                     Age = round(runif(x,18,65),0),
+                     Score = round(rnorm(x, 6, 2),1),
+                     IQ = round(rnorm(x, 100, 10),0),
+                     Date = rep(Sys.Date(), times = x),
+                     Country = sample(c("NZ","US","UK","AUS","CAN"), 
+                                      size = x, replace = TRUE))
+## convert data frame into a 'data frame tbl' format so dplyr can manipulate it
+mytibble <- tibble(datfra)
+
+newcols <- data.frame(Test_Version = rep(1.1, times = x),
+                      Weather = sample(c("Sunny","Rain","Cloudy","Windy"),
+                                       x, replace = TRUE),
+                      Gender = sample(c("Male","Female","Male","Female","Male",
+                                        "Female","Other"),x, replace = TRUE),
+                      Blood_Type = sample(c("A","B","AB","0"),x, replace = TRUE))
+newcols <- tibble(newcols)
+```  
+```{r intro to dplyr}
+## The  advantage to using a tbl_df over a regular data frame is the printing.
+mytibble
+```  
+First, we are shown the class and dimensions of the dataset. Just below that, we get a preview of the data. Instead of attempting to print the entire dataset, dplyr just shows us the first 10 rows of data and only as many columns as fit neatly in our console. At the bottom, we see the names and classes for any variables that didn't fit on our screen.  
+"The dplyr philosophy is to have small functions that each do one thing well." Specifically, dplyr supplies five 'verbs' that cover most fundamental data manipulation tasks: `select()`, `filter()`, `arrange()`, `mutate()`, and `summarize()`.  
+
+### `select()`  
+Select (and optionally rename) variables in a data frame, using a concise mini-language that makes it easy to refer to variables based on their name (e.g. a:f selects all columns from a on the left to f on the right). 
+```{r dplyr select 1}
+y <- select(mytibble, Name, Country, Score)
+## can rearrange the order of columns, no need to type datfratbl$Name, etc.
+head(y,5) 
+```  
+You can also use predicate functions like `is.numeric` to select variables based on their properties.  
+Tidyverse selections implement a dialect of R where operators make it easy to select variables:  
+
+ - `:` for selecting a range of consecutive variables.  
+ - `-` to omit a column.  
+ - `!` for taking the complement of a set of variables.  
+ - `&` and | for selecting the intersection or the union of two sets of variables.  
+ - `c()` for combining selections.  
+ - `everything()` Matches all variables.  
+ - `last_col()` Select last variable, possibly with an offset.  
+ - `starts_with()` Starts with a prefix.  
+ - `ends_with()` Ends with a suffix.  
+ - `contains()` Contains a literal string.  
+ - `matches()` Matches a regular expression.  
+ - `num_range()` Matches a numerical range like x01, x02, x03.  
+ - `all_of()` Matches variable names in a character vector. All names must be present, otherwise an out-of-bounds error is thrown.  
+ - `any_of()` Same as all_of(), except that no error is thrown for names that don't exist.  
+ - `where()` Applies a function to all variables and selects those for which the function returns TRUE.
+```{r dplyr select 2}
+y <- select(mytibble, Name:Confidence) ## using ":" to select columns
+head(y,5)
+y <- select(mytibble, -IQ)  ## using "-" to omit a column
+head(y,5)
+y <- select(mytibble, -(Score:Country))  ## mixing different strategies
+head(y,5)
+```  
+
+### `filter()`  
+The `filter()` function is used to subset a data frame, retaining all rows that satisfy your conditions. To be retained, the row must produce a value of `TRUE` for all conditions. Note that when a condition evaluates to `NA` the row will be dropped, unlike base subsetting with `[`.  
+```{r dplyr filter}
+y <- filter(mytibble, Height >= 1.8)  ## no need to use datfratbl$Height
+head(y,5)
+```
+
+
+### `arrange()`  
+Orders the rows of a data frame by the values of selected columns.  
+```{r dplyr arrange}
+y <- arrange(mytibble, Name)
+head(y,5)
+y <- arrange(mytibble, Country, Name) 
+## arrange by Country, and on identical groups, arrange by name
+head(y,5)
+```  
+
+### `mutate()`  
+`mutate()` adds new variables and preserves existing ones; `transmute()` adds new variables and drops existing ones. New variables overwrite existing variables of the same name. Variables can be removed by setting their value to `NULL`.  
+```{r dplyr mutate}
+y <- mutate(mytibble, Correct_Time = Time + 10) ## add 10 to Time in new column
+head(select(y, -(Confidence:Date)),5)
+y <- mutate(mytibble, Date = NULL) ## do not display Date column
+head(y,5)
+
+## merge data frames
+head(newcols,5)
+y <- mutate(select(mytibble, -IQ, -Confidence, -Date), newcols)
+head(y,5)
+```  
+
+### `summarize()`  
+`summarise() `creates a new data frame. It will have one (or more) rows for each combination of grouping variables; if there are no grouping variables, the output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified.  
+`summarise()` and `summarize()` are synonyms.  
+```{r dplyr summarize}
+summarize(mytibble, mean(Time)) ## mean of the Time column
+## this function becomes more useful once we introduce grouping to the 
+## data frame
+```
+
