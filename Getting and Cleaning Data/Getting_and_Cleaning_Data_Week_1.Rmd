@@ -6,6 +6,14 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r packages, include=FALSE }
+library(readxl)
+library(XML)
+library(jsonlite)
+library(data.table)
+library(dplyr)
+```
+
 
 # Course Description
 Before you can work with data you have to get some. This course will cover the basic ways that data can be obtained. The course will cover obtaining data from the web, from APIs, and from colleagues in various formats including raw text files, binary files, and databases. It will also cover the basics of data cleaning and how to make data tidy. Tidy data dramatically speed downstream data analysis tasks. The course will also cover the components of a complete data set including raw data, processing instructions, codebooks, and processed data. The course will cover the basics needed for collecting, cleaning, and sharing data.
@@ -117,9 +125,8 @@ You might use R to download files, so that the downloading process is included i
  - `file.exists("directoryName")`  
  - `dir.create("directoryName")`  
 ```{r}
-setwd("C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project")
-if(!file.exists("data")) {
-    dir.create("data")
+if(!file.exists("../data")) {
+    dir.create("../data")
 }  ## creates a folder called data, if it doesn't already exist.
 ```  
 
@@ -129,7 +136,7 @@ if(!file.exists("data")) {
  - important parameters are `url`, `destfile` and `method`.  
  - useful for downloading tab-delimited, csv and other files.  
 
-```{r error=TRUE}
+```{r Getting data from the internet, error=TRUE}
 fileURL <- "https://www.stats.govt.nz/assets/Uploads/Household-expenditure-statistics/Household-expenditure-statistics-Year-ended-June-2019/Download-data/detailed-household-expenditure-year-ended-June-2019-csv.csv"
 destinationfile <- "C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/HouseholdExpenditure2019.csv"
 ## download.file(fileURL, destfile = destinationfile)
@@ -137,6 +144,7 @@ list.files("C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/")
 dateDownloaded <- date()
 dateDownloaded
 ```  
+
  - method `curl` needs to be specified for https websites when downloading on a Mac. Not needed on windows.  
  - it's important to keep track of the date in which it was downloaded, as the file online could be updated.  
  
@@ -150,19 +158,21 @@ dateDownloaded
  
 # Reading local files  
  - repeat of content covered in R programming course  
-```{r}
+```{r Reading local files 1}
 str(read.table)
 ```  
+
  - `read.table()` is the main function, but requires a lot of parameters.  
  - there are faster methods  
  - reads the data into RAM, can cause problems for large sets.  
  - related to `read.csv()` and `read.csv2()`  
  
-```{r}
+```{r reading local files 2}
 destinationfile <- "C:/Users/RudyR/Desktop/R Projects/Rudys_First_Project/data/HouseholdExpenditure2019.csv"
 ExpenditureData <- read.table(destinationfile, sep = ",", header = TRUE)
 head(ExpenditureData)
 ```  
+
  - `read.csv()` has defaults `sep = ","` and `header = TRUE`.  
  - other parameters:  
   -- `quote` to tell R about quoted values. `quote=""` means no quotes.  
@@ -174,8 +184,8 @@ Quotation marks ' or " in data values can cause trouble for reading the data. Se
 
 # Reading Excel Files  
 Use packages to read excel files, such as *xlsx* (requires java), or *readxl* package. 
-```{r}
-library(readxl)
+```{r reading excel files}
+## library(readxl)
 str(read_xlsx)  ## many optional arguments
 cameras <- read_xlsx("../data/cameras.xlsx")
 head(cameras)
@@ -185,6 +195,7 @@ head(cameras)
  ## 
  ## XLConnect package has even more options for writing and manipulating
 ```  
+
  - *xlsx* package include options to read only specific columns. *readxl* can only select by rows.  
  - `write.xlsx` function available in *xlsx* package  
  - `read.xlsx2` is faster in large files.  
@@ -199,14 +210,15 @@ head(cameras)
   -- Content: the actual text of the document  
 
   **Tags, elements and attributes**  
-  Tags are general labels. E.g.: `<section>` and `</section>` to start and end a section, or `<line-break />` is an empty tag.  
-  Elements are specific examples of tags. E.g.: `<Greeting>` *Hello* `</Greeting>`  
-  Attributes are components of the label. E.g.: `<img src="jeff.jpg" alt="instructor" />  
-  Very similar to html  
+  
+ - Tags are general labels. E.g.: `<section>` and `</section>` to start and end a section, or `<line-break />` is an empty tag.  
+ - Elements are specific examples of tags. E.g.: `<Greeting>` *Hello* `</Greeting>`  
+ - Attributes are components of the label. E.g.: `<img src="jeff.jpg" alt="instructor" />  
+ - Very similar to html  
 
   *Using the XML package*
-```{r}
-library(XML)
+```{r reading XML files 1}
+## library(XML)
 fileURL <- "http://www.w3schools.com/xml/simple.xml"
 ## download.file(fileURL, destfile = "../data/simple.xml")
 doc <- xmlTreeParse("../data/simple.xml", useInternalNodes = TRUE) 
@@ -231,12 +243,13 @@ xmlSApply(rootNode, xmlValue)
   *Using the `XPath`, included in XML package*  
 Requires a whole new language, as well as learning XML, but a superficial understanding can already yield good results.  
 More information on [this link](http://www.stat.berkeley.edu/~statcur/Workshop2/Presentations/XML.pdf).  
+
  - `/node` Top level node  
  - `//node` node at any level  
  - `node[@attr-name]` Node with an attribute name  
  - `node[@attr-name='bob']` Node with attribute name attrname='bob'  
 
-```{r}
+```{r reading XML files 2}
 ## applies xmlValue to the nodes called "name"
 xpathSApply(rootNode, "//name", xmlValue) 
 
@@ -248,7 +261,7 @@ matrix(y,nrow = 4, ncol = 5)
 ```  
 
 ## Reading an HTML file  
-```{r}
+```{r reading HTML files}
 fileUrl <- "https://www.espn.com/nfl/team/schedule/_/name/bal/year/2016"
 ## download.file(fileUrl, destfile = "../data/ravens.html")
 doc <- htmlTreeParse("../data/ravens.html", useInternal=TRUE)
@@ -282,9 +295,9 @@ Read also the XML package tutorials, in the *Reading XML guides* folder.
 
 best place to start is wikipedia.  
 
-Use the jsonlite package  
-```{r}
-library(jsonlite)
+Use the `jsonlite` package  
+```{r reading JSON files}
+## library(jsonlite)
 jsonData <- fromJSON("https://api.github.com/users/jtleek/repos")
  ## object is a structured data frame. 
 names(jsonData) ## top level variables
@@ -293,7 +306,7 @@ names(jsonData$owner) ## within the element "owner" was stored another data
 ```  
 
 ## Writing JSON files  
-```{r}
+```{r writing JSON files}
 ## Using the Iris dataset as an example
 myjson <- toJSON(iris, pretty = TRUE) 
 ## pretty = TRUE gives it readable indentation.
@@ -307,8 +320,8 @@ head(iris)  ## data frame is identical to the original one
 # The data.table Package  
 Often faster and more memory efficient than data frames. All functions that accept data.frame work on data.table. Faster at subsetting, group and updating variables. Updated often.  
 Requires its own syntax.  
-```{r}
-library(data.table)
+```{r using data.table}
+## library(data.table)
 ## can be used in the same way as data.frame
 DF <- data.frame(x=round(rnorm(9),3),
                  y=rep(c("a","b","c"),each=3),
@@ -323,7 +336,7 @@ tables() ## allows you to check all data tables in the memory
 ```  
 
 ## Subsetting a data table  
-```{r}
+```{r Subsetting a data table 1}
 ## similar to data.frame
 DT[2,] ## subset rows by index
 DT[DT$y=="b",] ## subset rows by logical vector
@@ -335,10 +348,11 @@ DF[c(2,3)]
 ```  
 
 **Subsetting columns is different:**  
+
  - the argument you pass after the comma is called an "expression".  
  - In R an expression is a collection of statements enclosed in curly brackets.  
  - example:
-```{r}
+```{r Subsetting a data table 2}
 {
   x <- 1
   y <- 2
@@ -353,7 +367,7 @@ DT[,table(y)]
 ```  
  
 ## Adding new columns  
-```{r}
+```{r Adding columns to data tables 1}
 DT[, w:=round(z^2,3)] ## use := to add the variable w to the data frame.
 ## Doing this with data frame can be very memory consuming, but it's not a 
 ## problem in data.table
@@ -372,7 +386,7 @@ head(DT3,3) ## not changed
 
 ### Multiple step functions to create new variables  
  - each statement in an expression is followed by a ";".  
-```{r}
+```{r Adding columns to data tables 2}
 DT[ ,m:= {tmp <- (x+z); tmp2 <- log2(tmp+5); round(tmp2,2)}]
 ## assign temporary variable tmp, then use it.
 head(DT, 3)
@@ -380,7 +394,7 @@ head(DT, 3)
 
 ### "plyr" like operations  
  - plyr is an R package that makes it simple to split data apart, do stuff to it, and mash it back together.  
-```{r}
+```{r Other operations in data.table}
 DT[ ,a:=x>0] ## column a is logical
 head(DT,3)
 DT[, b:= mean(x+w),by=a] ## mean of rows where a == True is separated from 
@@ -391,7 +405,7 @@ head(DT,3) ## this is pretty cool!
 ### Special variables in data.table  
  - `.N` An integer, length 1, containing the number of rows  
   -- contains the number of times that a specific group appears  
-```{r}
+```{r Special variables in data.table}
 set.seed(123)
 DT2 <- data.table(x=sample(letters[1:3], 1E5, replace = TRUE))
 DT2[ , .N, by=x] ## count number of times / rows by x variable
@@ -400,7 +414,7 @@ DT2[ , .N, by=x] ## count number of times / rows by x variable
  
 ### Keys  
 Setting a key allows you to sort and subsett the data table much faster than you'd be able to on a data frame.  
-```{r}
+```{r Keys in data.table}
 DT2 <- data.table(x=rep(letters[1:3],each=100), y=round(rnorm(300),3))
 setkey(DT2,x) ## column x is set as the key
 head(DT2['a'],6) ## subsetting automatically knows to search for the key
@@ -408,7 +422,7 @@ head(DT2['a'],6) ## subsetting automatically knows to search for the key
 
 ### Joining data tables  
  - Use keys to facilitate joins  
-```{r}
+```{r Joining data tables}
 DT1 <- data.table(x=c("a","a","b","dt1"), y=1:4)
 DT2 <- data.table(x=c("a","b","dt2"), z=5:7)
 DT1
@@ -424,7 +438,7 @@ merge(DT1, DT2)  ## merge function uses the keys to organise the rows. Rows
  - `fread` function is provided by the data.table package.  
  - stands for "fast read"  
  - substitute for `read.table`
-```{r}
+```{r reading files is faster with data.table}
 big_df <- data.frame(x=round(rnorm(1E6),3),y=round(rnorm(1E6),3))
 head(big_df, 3)
 
@@ -436,6 +450,195 @@ system.time(read.table(file, header=TRUE, sep="\t"))
 ```  
 
 New functionalities are frequently being added to the data.table package.  
+
  - The latest version can be found [here](https://r-forge.r-project.org/scm/viewvc.php/pkg/NEWS?view=markup&root=datatable)  
  - [Here](http://stackoverflow.com/questions/13618488/what-you-can-do-with-data-frame-that-you-cant-in-data-table) is a list of differences between `data.table` and `data.frame`  
  - Credit to [Raphael Gottardo and Kevin Ushey](https://github.com/raphg/Biostat-578/blob/master/Advanced_data_manipulation.Rpres)
+
+# Swirl
+Install Getting and Cleaning Data course with the command `install_from_swirl("Getting and Cleaning Data")`.  
+
+## Manipulating Data with `dplyr` package  
+```{r dplyr setup, include=FALSE}
+## library(dplyr)
+set.seed(17)
+x <- 50
+datfra <- data.frame(Name = paste(sample(LETTERS, x, replace = TRUE),
+                                   sample(letters, x, replace = TRUE),
+                                   sample(letters, x, replace = TRUE),
+                                   sample(letters, x, replace = TRUE), 
+                                   sep = ""), 
+                     Height = round(rnorm(x, mean = 1.6, sd = 0.2),2), 
+                     Time = round(rnorm(x, mean = 30, sd = 8),1), 
+                     Confidence = round(runif(x,0,10),0),
+                     Age = round(runif(x,18,65),0),
+                     Score = round(rnorm(x, 6, 2),1),
+                     IQ = round(rnorm(x, 100, 10),0),
+                     Date = rep(Sys.Date(), times = x),
+                     Country = sample(c("NZ","US","UK","AUS","CAN"), 
+                                      size = x, replace = TRUE))
+## convert data frame into a 'data frame tbl' format so dplyr can manipulate it
+mytibble <- tibble(datfra)
+
+newcols <- data.frame(Test_Version = rep(1.1, times = x),
+                      Weather = sample(c("Sunny","Rain","Cloudy","Windy"),
+                                       x, replace = TRUE),
+                      Gender = sample(c("Male","Female","Male","Female","Male",
+                                        "Female","Other"),x, replace = TRUE),
+                      Blood_Type = sample(c("A","B","AB","0"),
+                                          x, replace = TRUE))
+newcols <- tibble(newcols)
+```  
+```{r intro to dplyr}
+## The  advantage to using a tbl_df over a regular data frame is the printing.
+mytibble
+```  
+First, we are shown the class and dimensions of the dataset. Just below that, we get a preview of the data. Instead of attempting to print the entire dataset, dplyr just shows us the first 10 rows of data and only as many columns as fit neatly in our console. At the bottom, we see the names and classes for any variables that didn't fit on our screen.  
+"The dplyr philosophy is to have small functions that each do one thing well." Specifically, dplyr supplies five 'verbs' that cover most fundamental data manipulation tasks: `select()`, `filter()`, `arrange()`, `mutate()`, and `summarize()`.  
+
+### `select()`  
+Select (and optionally rename) variables in a data frame, using a concise mini-language that makes it easy to refer to variables based on their name (e.g. a:f selects all columns from a on the left to f on the right). 
+```{r dplyr select 1}
+y <- select(mytibble, Name, Country, Score)
+## can rearrange the order of columns, no need to type datfratbl$Name, etc.
+head(y,5) 
+```  
+You can also use predicate functions like `is.numeric` to select variables based on their properties.  
+Tidyverse selections implement a dialect of R where operators make it easy to select variables:  
+
+ - `:` for selecting a range of consecutive variables.  
+ - `-` to omit a column.  
+ - `!` for taking the complement of a set of variables.  
+ - `&` and | for selecting the intersection or the union of two sets of variables.  
+ - `c()` for combining selections.  
+ - `everything()` Matches all variables.  
+ - `last_col()` Select last variable, possibly with an offset.  
+ - `starts_with()` Starts with a prefix.  
+ - `ends_with()` Ends with a suffix.  
+ - `contains()` Contains a literal string.  
+ - `matches()` Matches a regular expression.  
+ - `num_range()` Matches a numerical range like x01, x02, x03.  
+ - `all_of()` Matches variable names in a character vector. All names must be present, otherwise an out-of-bounds error is thrown.  
+ - `any_of()` Same as all_of(), except that no error is thrown for names that don't exist.  
+ - `where()` Applies a function to all variables and selects those for which the function returns TRUE.
+```{r dplyr select 2}
+y <- select(mytibble, Name:Confidence) ## using ":" to select columns
+head(y,5)
+y <- select(mytibble, -IQ)  ## using "-" to omit a column
+head(y,5)
+y <- select(mytibble, -(Score:Country))  ## mixing different strategies
+head(y,5)
+```  
+
+### `filter()`  
+The `filter()` function is used to subset a data frame, retaining all rows that satisfy your conditions. To be retained, the row must produce a value of `TRUE` for all conditions. Note that when a condition evaluates to `NA` the row will be dropped, unlike base subsetting with `[`.  
+```{r dplyr filter}
+y <- filter(mytibble, Height >= 1.8)  ## no need to use datfratbl$Height
+head(y,5)
+```
+
+
+### `arrange()`  
+Orders the rows of a data frame by the values of selected columns.  
+```{r dplyr arrange}
+y <- arrange(mytibble, Name)
+head(y,5)
+y <- arrange(mytibble, Country, Name) 
+## arrange by Country, and on identical groups, arrange by name
+head(y,5)
+```  
+
+### `mutate()`  
+`mutate()` adds new variables and preserves existing ones; `transmute()` adds new variables and drops existing ones. New variables overwrite existing variables of the same name. Variables can be removed by setting their value to `NULL`.  
+```{r dplyr mutate}
+y <- mutate(mytibble, Correct_Time = Time + 10) ## add 10 to Time in new column
+head(select(y, -(Confidence:Date)),5)
+y <- mutate(mytibble, Date = NULL) ## do not display Date column
+head(y,5)
+
+## merge data frames
+head(newcols,5)
+y <- mutate(select(mytibble, -IQ, -Confidence, -Date), newcols)
+head(y,5)
+```  
+
+### `summarize()`  
+`summarise() `creates a new data frame. It will have one (or more) rows for each combination of grouping variables; if there are no grouping variables, the output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified.  
+`summarise()` and `summarize()` are synonyms.  
+```{r dplyr summarize}
+summarize(mytibble, mean(Time)) ## mean of the Time column
+## this function becomes more useful once we introduce grouping to the 
+## data frame
+```
+
+# Quiz Week 1  
+*Question 1*
+The American Community Survey distributes downloadable data about United States communities. Download the 2006 microdata survey about housing for the state of Idaho using download.file() from here:  
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv  
+and load the data into R. The code book, describing the variable names is here:  
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FPUMSDataDict06.pdf  
+How many properties are worth $1,000,000 or more?  
+```{r question 1}
+housing <- read.csv("./Quiz week 1/getdata_data_ss06hid.csv")
+VAL <- housing$VAL[!is.na(housing$VAL)]
+sum(VAL == 24)
+```  
+
+*Question 2*  
+Use the data you loaded from Question 1. Consider the variable FES in the code book. Which of the "tidy data" principles does this variable violate?  
+```{r question 2}
+## Numeric values in tidy data can not represent categories.
+```  
+
+*Question 3*  
+Download the Excel spreadsheet on Natural Gas Aquisition Program here:  
+ https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FDATA.gov_NGAP.xlsx  
+Read rows 18-23 and columns 7-15 into R and assign the result to a variable called `dat`.  
+What is the value of `sum(dat$Zip*dat$Ext,na.rm=T)`
+```{r question 3}
+dat <- read_xlsx("./Quiz week 1/getdata_data_DATA.gov_NGAP.xlsx", 
+                 range = "G18:O23")
+dat
+sum(dat$Zip*dat$Ext,na.rm=T)
+```  
+
+*Question 4*  
+Read the XML data on Baltimore restaurants from here:  
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml  
+How many restaurants have zipcode 21231?  
+```{r question 4}
+rest <- xmlTreeParse("./Quiz week 1/getdata_data_restaurants.xml", 
+                     useInternalNodes = TRUE)
+datrest <- xmlRoot(rest)
+zipcode <- xpathApply(datrest, "//zipcode", xmlValue)
+sum(zipcode == 21231)
+```
+
+*Question 5*  
+The American Community Survey distributes downloadable data about United States communities. Download the 2006 microdata survey about housing for the state of Idaho using download.file() from here:  
+https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv  
+using the fread() command load the data into an R object called `DT`  
+The following are ways to calculate the average value of the variable `pwgtp15`  
+broken down by sex. Using the data.table package, which will deliver the fastest user time?  
+```{r question 5, error=TRUE}
+DT <- fread(file = "./Quiz week 1/getdata_data_ss06pid.csv")
+
+system.time(DT[,mean(pwgtp15),by=SEX])
+system.time(sapply(split(DT$pwgtp15,DT$SEX),mean))
+system.time(tapply(DT$pwgtp15,DT$SEX,mean))
+system.time(mean(DT[DT$SEX==1,]$pwgtp15),
+         mean(DT[DT$SEX==2,]$pwgtp15))
+
+mean(DT$pwgtp15,by=DT$SEX) ## incorrect answer
+rowMeans(DT)[DT$SEX==1]; rowMeans(DT)[DT$SEX==2]  ## returns error
+```
+
+```{r unloading packages, include=FALSE}
+detach("package:dplyr", unload=TRUE)
+detach("package:data.table", unload=TRUE)
+detach("package:jsonlite", unload=TRUE)
+detach("package:XML", unload=TRUE)
+detach("package:readxl", unload=TRUE)
+```
+
+
